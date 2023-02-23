@@ -7,6 +7,8 @@
 
 #include <map>
 #include <iostream>
+#include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -29,14 +31,29 @@ private:
     };
 
     map<string,string> keyWordsPattern = {
-            {"if","is conditional statement"},
-            {"for","is conditional statement"},
-            {"do","is conditional statement"},
-            {"while","is conditional statement"},
+            //SELECTION STATEMENTS
+            {"if","is a selection statement"},
+            {"else","is a selection statement"},
+            {"switch","is a selection statement"},
+            {"case","is a selection statement"},
+            {"deafult","is a selection statement"},
+            //ITERATION STATEMENT
+            {"for","is an iteration statement"},
+            {"do","is an iteration statement"},
+            {"while","is an iteration statement"},
+            //JUMP STATEMENT
+            {"return","is a jump statement"},
+            {"break","is a jump statement"},
+            {"continue","is a jump statement"},
+            {"goto","is a jump statement"},
+            //
+
+
 
     };
 
     map<string,string> operatorsPattern = {
+            //ARITHMETIC OPERATORS
             {"+","is arithmetic operator"},
             {"+=","is arithmetic operator"},
             {"-","is arithmetic operator"},
@@ -45,7 +62,7 @@ private:
             {"/=","is arithmetic operator"},
             {"*","is arithmetic operator"},
             {"*=","is arithmetic operator"},
-
+            //COMPARISON OPERATORS
             {"==","is comparison operator"},
             {"!=","is comparison operator"},
     };
@@ -55,10 +72,13 @@ private:
     map<string,string> keyWordsTable;
     map<string,string> operatorsTale;
 
-    void FormTable();
+    vector<pair<int,string>> fileLines;
+
+    vector<pair<int,string>> readFile(const string& path);
+
 public:
     LexicalAnalyser();
-
+    void Analyse();
     void PrintTables();
 };
 
