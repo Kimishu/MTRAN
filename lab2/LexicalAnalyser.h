@@ -97,7 +97,7 @@ public:
 
     [[maybe_unused]] explicit LexicalAnalyser(const string& path);
     void Analyse();
-    void PrintTables();
+    static void PrintTables(const string& tableName, map<string,string>& table);
 };
 
 

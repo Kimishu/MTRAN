@@ -5,18 +5,24 @@
 #include "LexicalAnalyser.h"
 
 LexicalAnalyser::LexicalAnalyser() {
-    defaultPath = R"(D:\Programs\bsuir\6sem\mtran\dev\MTRAN\lab2\input.java)";
+    defaultPath = R"(D:\Programs\6sem\mtran\dev\MTRAN\lab2\input.java)";
 }
 
 [[maybe_unused]] LexicalAnalyser::LexicalAnalyser(const string &path) {
     defaultPath = path;
 }
 
-void LexicalAnalyser::PrintTables() {
-    cout << "\t\tVariables Table" << endl;
-    for(pair<const basic_string<char>, basic_string<char>>& pr: variablesTable){
-
+void LexicalAnalyser::PrintTables(const string& tableName, map<string,string>& table) {
+    cout << "\t\t***"<< tableName <<" Table***" << endl;
+    for(int i = 0; i<30; i++) cout << '=';
+    cout << endl;
+    for(pair<const basic_string<char>, basic_string<char>>& pr: table){
+        cout << pr.first << "\t|\t" << pr.second << endl;
     }
+    for(int i = 0; i<30; i++) cout << '=';
+    cout << endl;
+    cout << endl;
+    cout << endl;
 }
 
 vector<pair<int,string>> LexicalAnalyser::readFile(const string &path) {
@@ -43,15 +49,15 @@ void LexicalAnalyser::Analyse() {
         bool variable = false;
         for(char& ch: line.second){
 
-            if(any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})) {
+            if(!any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})) {
 
                 word += ch;
 
             }
 
-            if(any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})){
-                
-            }
+//            if(any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})){
+//
+//            }
 
             if(variable){
                 if((any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;}) && !word.empty()) ||
@@ -133,6 +139,9 @@ void LexicalAnalyser::Analyse() {
 
     }
 
-    PrintTables();
+    PrintTables("Variables types", variablesTypesTable);
+    PrintTables("Variables", variablesTable);
+    PrintTables("Key Words", keyWordsTable);
+    PrintTables("Operators", operatorsTable);
 
 }
