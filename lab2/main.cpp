@@ -1,7 +1,7 @@
 #include <iostream>
 #include <algorithm>
-#include <fstream>
-#include <vector>
+#include "LexicalAnalyser.h"
+
 
 using namespace std;
 
@@ -14,10 +14,11 @@ int main() {
         cout << "Error! Token must not be a keyword\n";
     }
 
-    unsigned long l = -1;
+    LexicalAnalyser ls;
 
-    cout << l << endl;
+    ls.Analyse();
 
+    cout << "Done" << endl;
 
     return 0;
 }

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <algorithm>
 
 using namespace std;
 
@@ -67,17 +68,34 @@ private:
             {"!=","is comparison operator"},
     };
 
+    vector<char> chars = {
+            ' ',
+            '\n',
+            '{',
+            '}',
+            ';',
+            '(',
+            ')',
+            '\t',
+            '\r',
+            '#'};
 
+
+    map<string, string> variablesTypesTable;
     map<string, string> variablesTable;
     map<string,string> keyWordsTable;
-    map<string,string> operatorsTale;
+    map<string,string> operatorsTable;
+    map<string,string> constantsTable;
 
     vector<pair<int,string>> fileLines;
+    string defaultPath;
 
-    vector<pair<int,string>> readFile(const string& path);
+    static vector<pair<int,string>> readFile(const string& path);
 
 public:
     LexicalAnalyser();
+
+    [[maybe_unused]] explicit LexicalAnalyser(const string& path);
     void Analyse();
     void PrintTables();
 };
