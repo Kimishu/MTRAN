@@ -5,6 +5,18 @@
 
 using namespace std;
 
+vector<char> chars = {
+        ' ',
+        '\n',
+        '{',
+        '}',
+        ';',
+        '(',
+        ')',
+        '\t',
+        '\r',
+        '#'};
+
 int main() {
 
 //    string s = "if";
@@ -14,11 +26,41 @@ int main() {
 //        cout << "Error! Token must not be a keyword\n";
 //    }
 
-    LexicalAnalyser ls;
+//    LexicalAnalyser ls;
+//
+//    ls.Analyse();
+//
+//    cout << "\nDone" << endl;
 
-    ls.Analyse();
+    string tmp = "int factorial = 5++;";
 
-    cout << "\nDone" << endl;
+    int a = 5;
+
+    vector<string> types;
+    vector<string> vars;
+    vector<string> operators;
+    bool variable = false;
+    string word;
+    for(char& ch: tmp){
+
+        if(!any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})){
+            word+= ch;
+        }
+
+        if(variable){
+            if(any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})){
+
+            }
+        }
+
+        if(word == "int"){
+            types.push_back(word);
+            word.clear();
+            variable = true;
+            continue;
+        }
+
+    }
 
     return 0;
 }

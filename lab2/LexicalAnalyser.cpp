@@ -5,7 +5,7 @@
 #include "LexicalAnalyser.h"
 
 LexicalAnalyser::LexicalAnalyser() {
-    defaultPath = R"(D:\Programs\6sem\mtran\dev\MTRAN\lab2\input.java)";
+    defaultPath = R"(D:\Programs\bsuir\6sem\mtran\dev\MTRAN\lab2\input.java)";
 }
 
 [[maybe_unused]] LexicalAnalyser::LexicalAnalyser(const string &path) {
@@ -53,12 +53,10 @@ void LexicalAnalyser::Analyse() {
 
                 word += ch;
 
+                //continue;
             }
 
-//            if(any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})){
-//
-//            }
-
+            //Variables Name
             if(variable){
                 if((any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;}) && !word.empty()) ||
                         (any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](pair<const basic_string<char>, basic_string<char>> kw)
@@ -76,6 +74,7 @@ void LexicalAnalyser::Analyse() {
                 word.clear();
             }
 
+            //Key Words
             if(any_of(keyWordsPattern.begin(), keyWordsPattern.end(), [&word](
                     const pair<const basic_string<char>, basic_string<char>>& kw) { return word == kw.first; })){
 
@@ -93,6 +92,7 @@ void LexicalAnalyser::Analyse() {
                 continue;
             }
 
+            //Variables Types
             if(any_of(variablesPattern.begin(), variablesPattern.end(), [&word](
                     const pair<const basic_string<char>, basic_string<char>>& kw) { return word == kw.first; })){
 
@@ -113,6 +113,7 @@ void LexicalAnalyser::Analyse() {
                 continue;
             }
 
+            //Operators
             if(any_of(operatorsPattern.begin(), operatorsPattern.end(), [&word](
                     const pair<const basic_string<char>, basic_string<char>>& kw) { return word == kw.first; })){
 
@@ -129,6 +130,9 @@ void LexicalAnalyser::Analyse() {
                 word.clear();
                 continue;
             }
+
+//            if(ch == ' ' || any_of(operatorsPattern.begin(),operatorsPattern.end(),[&ch](
+//                    const pair<const basic_string<char>, basic_string<char>>& kw) { return to_string(ch) == kw.first; }))
 
             //error
 
