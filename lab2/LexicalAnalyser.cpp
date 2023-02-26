@@ -48,30 +48,51 @@ void LexicalAnalyser::Analyse() {
         string word;
         bool variable = false;
         for(char& ch: line.second){
-
+//number-
             if(!any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})) {
 
                 word += ch;
 
-                //continue;
+                if(word == "number-"){
+                    cout<<endl;
+                }
+            }
+
+            if(ch == '-'){//any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](pair<const basic_string<char>, basic_string<char>> kw){return to_string(ch) == kw.first;})){
+                if(word == "number-"){
+                    cout<<endl;
+                }
+                if(word.length()>2){
+                    word.clear();
+                    continue;
+                }
             }
 
             //Variables Name
             if(variable){
-                if((any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;}) && !word.empty()) ||
-                        (any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](pair<const basic_string<char>, basic_string<char>> kw)
-                        {return to_string(ch) == kw.first;}))){
-                    variable = false;
-                    variablesTable.insert(make_pair(word,"VAR"));
-                    word.clear();
+                if((any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})
+                || any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](pair<const basic_string<char>, basic_string<char>> kw){string tmp = string(1,ch); return tmp == kw.first;}))
+                && !word.empty()){
+                    if(!any_of(variablesTable.begin(), variablesTable.end(),[&word](const pair<const basic_string<char>, basic_string<char>>& kw){return word == kw.first;})) {
+                        variablesTable.insert(make_pair(word, "VAR"));
+                        variable = false;
+                        word.clear();
+                    }
+                    else {
+                        cout << "ERROR, variable with the same name was already defined!" << endl;
+                        variable = false;
+                        word.clear();
+                    }
                 }
-
                 continue;
             }
 
-            if(any_of(variablesTable.begin(), variablesTable.end(), [&word](
+            if(((any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})
+                 || any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](pair<const basic_string<char>, basic_string<char>> kw){string tmp = string(1,ch); return tmp == kw.first;}))
+                && !word.empty())&& any_of(variablesTable.begin(), variablesTable.end(), [&word](
                     const pair<const basic_string<char>, basic_string<char>>& kw) { return word == kw.first; })){
                 word.clear();
+                continue;
             }
 
             //Key Words
@@ -131,12 +152,25 @@ void LexicalAnalyser::Analyse() {
                 continue;
             }
 
-//            if(ch == ' ' || any_of(operatorsPattern.begin(),operatorsPattern.end(),[&ch](
-//                    const pair<const basic_string<char>, basic_string<char>>& kw) { return to_string(ch) == kw.first; }))
-
-            //error
 
             //Constant table
+            stringstream temp(word);
+            if(temp.good() && !word.empty() && any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})){
+                pair<string,string> pr;
+                if(word == to_string(stoi(word))){
+                    pr = make_pair(word,"Constant of int type");
+                }
+                else if(word == to_string(stod(word))) {
+                    pr = make_pair(word,"Constant of double(float) type");
+                }
+
+                constantsTable.insert(pr);
+
+                word.clear();
+                continue;
+            }
+
+            //error
 
 
         }
@@ -148,4 +182,11 @@ void LexicalAnalyser::Analyse() {
     PrintTables("Key Words", keyWordsTable);
     PrintTables("Operators", operatorsTable);
 
+}
+
+bool LexicalAnalyser::isNum(string &word) {
+    char * pEnd = NULL;
+    double d = strtod(word.c_str(), &pEnd);
+
+    return *pEnd;
 }

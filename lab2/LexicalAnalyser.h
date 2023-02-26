@@ -10,6 +10,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -63,9 +64,14 @@ private:
             {"/=","is arithmetic operator"},
             {"*","is arithmetic operator"},
             {"*=","is arithmetic operator"},
+            {"=","is arithmetic operator"},
             //COMPARISON OPERATORS
             {"==","is comparison operator"},
             {"!=","is comparison operator"},
+            {"<","is comparison operator"},
+            {">","is comparison operator"},
+            {"<=","is comparison operator"},
+            {">=","is comparison operator"},
     };
 
     vector<char> chars = {
@@ -91,6 +97,7 @@ private:
     string defaultPath;
 
     static vector<pair<int,string>> readFile(const string& path);
+    bool isNum(string& word);
 
 public:
     LexicalAnalyser();

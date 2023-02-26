@@ -1,4 +1,6 @@
 int factorial(int number){
+    int b;
+    int f = 5;
     if(number < 0){
         return 0;
     }
