@@ -46,135 +46,78 @@ void LexicalAnalyser::Analyse() {
     for(pair<int,string>& line: fileLines){
 
         string word;
-        bool variable = false;
-        for(char& ch: line.second){
-//number-
-            if(!any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})) {
 
-                word += ch;
+        bool isVariable = false;
+        for(char& ch : line.second){
+            bool isChars = any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;});
+            bool isOperator = any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](const pair<string,string>& pr){return string(1,ch) == pr.first;});
 
-                if(word == "number-"){
-                    cout<<endl;
-                }
+            if(!isChars && !isOperator){
+                word+=ch;
+                if(!any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](const pair<string,string>& pr){return string(1,*(&ch+1)) == pr.first;}))
+                    continue;
             }
-
-            if(ch == '-'){//any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](pair<const basic_string<char>, basic_string<char>> kw){return to_string(ch) == kw.first;})){
-                if(word == "number-"){
-                    cout<<endl;
-                }
-                if(word.length()>2){
-                    word.clear();
+            if(isOperator) {
+                word+=ch;
+                if(!any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](const pair<string,string>& pr){return string(1,*(&ch+1)) == pr.first;})
+                && !any_of(chars.begin(), chars.end(), [&ch](char& c){return *(&ch+1) == c;})) {
+                    isOperator = false;
+                } else{
                     continue;
                 }
             }
-
-            //Variables Name
-            if(variable){
-                if((any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})
-                || any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](pair<const basic_string<char>, basic_string<char>> kw){string tmp = string(1,ch); return tmp == kw.first;}))
-                && !word.empty()){
-                    if(!any_of(variablesTable.begin(), variablesTable.end(),[&word](const pair<const basic_string<char>, basic_string<char>>& kw){return word == kw.first;})) {
-                        variablesTable.insert(make_pair(word, "VAR"));
-                        variable = false;
-                        word.clear();
-                    }
-                    else {
-                        cout << "ERROR, variable with the same name was already defined!" << endl;
-                        variable = false;
-                        word.clear();
-                    }
-                }
+            if(word.empty()){
                 continue;
             }
 
-            if(((any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})
-                 || any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](pair<const basic_string<char>, basic_string<char>> kw){string tmp = string(1,ch); return tmp == kw.first;}))
-                && !word.empty())&& any_of(variablesTable.begin(), variablesTable.end(), [&word](
-                    const pair<const basic_string<char>, basic_string<char>>& kw) { return word == kw.first; })){
+            if (string type; any_of(variablesPattern.begin(), variablesPattern.end(), [&word, &type](
+                    const pair<string, string> &kw) {
+                if (word == kw.first) {
+                    type = kw.second;
+                    return true;
+                }
+                return false;
+            })) {
+                variablesTypesTable.insert(make_pair(word, type));
+                word.clear();
+                isVariable = true;
+
+                continue;
+            }
+
+            if (isVariable) {
+                if (!any_of(variablesTable.begin(), variablesTable.end(),
+                            [&word](const pair<string, string> &pr) { return word == pr.first; })) {
+                    variablesTable.insert(make_pair(word, "is a variable"));
+                    word.clear();
+                    isVariable = false;
+                    continue;
+                }
+            }
+            if (any_of(variablesTable.begin(), variablesTable.end(),
+                       [&word](const pair<string, string> &pr) { return word == pr.first; })) {
                 word.clear();
                 continue;
             }
 
-            //Key Words
-            if(any_of(keyWordsPattern.begin(), keyWordsPattern.end(), [&word](
-                    const pair<const basic_string<char>, basic_string<char>>& kw) { return word == kw.first; })){
-
-                map<string,string>::iterator iter;
-
-                for(iter = keyWordsPattern.begin(); iter != keyWordsPattern.end(); iter++){
-                    if(word == iter->first){
-                        break;
-                    }
+            if(string type; any_of(keyWordsPattern.begin(), keyWordsPattern.end(), [&word, &type](const pair<string,string>& pr){
+                if(word == pr.first){
+                    type = pr.second;
+                    return true;
                 }
-
-                keyWordsTable.insert(make_pair(word, iter->second));
-
+                return false;
+            })){
+                keyWordsTable.insert(make_pair(word,type));
                 word.clear();
                 continue;
             }
 
-            //Variables Types
-            if(any_of(variablesPattern.begin(), variablesPattern.end(), [&word](
-                    const pair<const basic_string<char>, basic_string<char>>& kw) { return word == kw.first; })){
-
-                map<string,string>::iterator iter;
-
-                for(iter = variablesPattern.begin(); iter != variablesPattern.end(); iter++){
-                    if(word == iter->first){
-                        break;
-                    }
-                }
-
-                variablesTypesTable.insert(make_pair(word, iter->second));
-
-                word.clear();
-
-                variable = true;
-
-                continue;
-            }
-
-            //Operators
-            if(any_of(operatorsPattern.begin(), operatorsPattern.end(), [&word](
-                    const pair<const basic_string<char>, basic_string<char>>& kw) { return word == kw.first; })){
-
-                map<string,string>::iterator iter;
-
-                for(iter = operatorsPattern.begin(); iter != operatorsPattern.end(); iter++){
-                    if(word == iter->first){
-                        break;
-                    }
-                }
-
-                operatorsTable.insert(make_pair(word, iter->second));
-
+            if(any_of(operatorsPattern.begin(), operatorsPattern.end(), [&word](const pair<string,string>& pr){return word == pr.first;})){
+                operatorsTable.insert(make_pair(word,"operator"));
                 word.clear();
                 continue;
             }
-
-
-            //Constant table
-            stringstream temp(word);
-            if(temp.good() && !word.empty() && any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;})){
-                pair<string,string> pr;
-                if(word == to_string(stoi(word))){
-                    pr = make_pair(word,"Constant of int type");
-                }
-                else if(word == to_string(stod(word))) {
-                    pr = make_pair(word,"Constant of double(float) type");
-                }
-
-                constantsTable.insert(pr);
-
-                word.clear();
-                continue;
-            }
-
-            //error
-
-
         }
-
     }
 
     PrintTables("Variables types", variablesTypesTable);

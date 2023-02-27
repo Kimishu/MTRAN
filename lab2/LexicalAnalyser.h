@@ -57,8 +57,10 @@ private:
     map<string,string> operatorsPattern = {
             //ARITHMETIC OPERATORS
             {"+","is arithmetic operator"},
+            {"++","is arithmetic operator"},
             {"+=","is arithmetic operator"},
             {"-","is arithmetic operator"},
+            {"--","is arithmetic operator"},
             {"-=","is arithmetic operator"},
             {"/","is arithmetic operator"},
             {"/=","is arithmetic operator"},
