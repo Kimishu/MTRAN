@@ -117,6 +117,26 @@ void LexicalAnalyser::Analyse() {
                 word.clear();
                 continue;
             }
+
+            stringstream temporal(word);
+            if(temporal.good() && isChars){
+                pair<string,string> pr;
+                if(word == to_string(stoi(word))){
+                    pr = make_pair(word,"Constant of int type");
+                }
+                else {
+                    string number = to_string(stod(word));
+                    while (word != number){
+                        number.pop_back();
+                    }
+                    pr = make_pair(number,"Constant of double(float) type");
+                }
+
+                constantsTable.insert(pr);
+
+                word.clear();
+                continue;
+            }
         }
     }
 
@@ -124,6 +144,7 @@ void LexicalAnalyser::Analyse() {
     PrintTables("Variables", variablesTable);
     PrintTables("Key Words", keyWordsTable);
     PrintTables("Operators", operatorsTable);
+    PrintTables("Constants", constantsTable);
 
 }
 

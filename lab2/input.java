@@ -1,7 +1,7 @@
 int factorial(int number){
     int b;
     double v;
-    float c = 4;
+    float c = 4.0;
     int f= c++;
     float zaza=c+f;
     if(number < 0){

@@ -48,7 +48,7 @@ private:
             {"break","is a jump statement"},
             {"continue","is a jump statement"},
             {"goto","is a jump statement"},
-            //
+            //PRIVACY STATEMENT
 
 
 
