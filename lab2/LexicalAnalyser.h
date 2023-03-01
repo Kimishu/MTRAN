@@ -11,6 +11,7 @@
 #include <fstream>
 #include <algorithm>
 #include <sstream>
+#include <regex>
 
 using namespace std;
 
@@ -86,7 +87,9 @@ private:
             ')',
             '\t',
             '\r',
-            '#'};
+            '#',
+            ',',
+            ':'};
 
 
     map<string, string> variablesTypesTable;
@@ -94,12 +97,12 @@ private:
     map<string,string> keyWordsTable;
     map<string,string> operatorsTable;
     map<string,string> constantsTable;
+    map<string,string> errorsTable;
 
     vector<pair<int,string>> fileLines;
     string defaultPath;
 
     static vector<pair<int,string>> readFile(const string& path);
-    bool isNum(string& word);
 
 public:
     LexicalAnalyser();

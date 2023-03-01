@@ -46,7 +46,6 @@ void LexicalAnalyser::Analyse() {
     for(pair<int,string>& line: fileLines){
 
         string word;
-
         bool isVariable = false;
         for(char& ch : line.second){
             bool isChars = any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;});
@@ -54,6 +53,9 @@ void LexicalAnalyser::Analyse() {
 
             if(!isChars && !isOperator){
                 word+=ch;
+                if(word == "djgdjgdgh"){
+                    cout << endl;
+                }
                 if(!any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](const pair<string,string>& pr){return string(1,*(&ch+1)) == pr.first;}))
                     continue;
             }
@@ -67,6 +69,47 @@ void LexicalAnalyser::Analyse() {
                 }
             }
             if(word.empty()){
+                continue;
+            }
+
+
+            if (isVariable) {
+                if(isdigit(word[0])){
+                    errorsTable.insert(make_pair("input.java:"+to_string(line.first) + ":" + to_string(line.second.find(ch)-word.length()+1),"Variable mustnt starts with a digit!"));
+                } else {
+                    if (!any_of(variablesTable.begin(), variablesTable.end(),
+                                [&word](const pair<string, string> &pr) { return word == pr.first; })) {
+                        if (!any_of(keyWordsPattern.begin(), keyWordsPattern.end(),
+                                    [&word](const pair<string, string> &pr) { return word == pr.first; }) &&
+                            !any_of(variablesPattern.begin(), variablesPattern.end(),
+                                    [&word](const pair<string, string> &pr) { return word == pr.first; })) {
+                            variablesTable.insert(make_pair(word, "is a variable"));
+                        } else {
+                            string type;
+                            if (any_of(keyWordsPattern.begin(), keyWordsPattern.end(),
+                                       [&word](const pair<string, string> &pr) { return word == pr.first; })) {
+                                type = "keyword";
+                            } else {
+                                type = "data type";
+                            }
+                            errorsTable.insert(make_pair("input.java:" + to_string(line.first) + ":" +
+                                                         to_string(line.second.find(ch) - word.length() + 1),
+                                                         "Variable name mustn't be a " + type + "! Its forbidden!"));
+                        }
+                    } else {
+                        errorsTable.insert(make_pair("input.java:" + to_string(line.first) + ":" +
+                                                     to_string(line.second.find(ch) - word.length() + 1),
+                                                     "Variable with this name already defined!"));
+                    }
+                }
+                word.clear();
+
+                isVariable = false;
+                continue;
+            }
+            if (any_of(variablesTable.begin(), variablesTable.end(),
+                       [&word](const pair<string, string> &pr) { return word == pr.first; })) {
+                word.clear();
                 continue;
             }
 
@@ -85,21 +128,6 @@ void LexicalAnalyser::Analyse() {
                 continue;
             }
 
-            if (isVariable) {
-                if (!any_of(variablesTable.begin(), variablesTable.end(),
-                            [&word](const pair<string, string> &pr) { return word == pr.first; })) {
-                    variablesTable.insert(make_pair(word, "is a variable"));
-                    word.clear();
-                    isVariable = false;
-                    continue;
-                }
-            }
-            if (any_of(variablesTable.begin(), variablesTable.end(),
-                       [&word](const pair<string, string> &pr) { return word == pr.first; })) {
-                word.clear();
-                continue;
-            }
-
             if(string type; any_of(keyWordsPattern.begin(), keyWordsPattern.end(), [&word, &type](const pair<string,string>& pr){
                 if(word == pr.first){
                     type = pr.second;
@@ -112,14 +140,19 @@ void LexicalAnalyser::Analyse() {
                 continue;
             }
 
-            if(any_of(operatorsPattern.begin(), operatorsPattern.end(), [&word](const pair<string,string>& pr){return word == pr.first;})){
-                operatorsTable.insert(make_pair(word,"operator"));
+            if(string type; any_of(operatorsPattern.begin(), operatorsPattern.end(), [&word, &type](const pair<string,string>& pr){
+                if(word == pr.first){
+                    type = pr.second;
+                    return true;
+                }
+                return false;
+            })){
+                operatorsTable.insert(make_pair(word,type));
                 word.clear();
                 continue;
             }
 
-            stringstream temporal(word);
-            if(temporal.good() && isChars){
+            if(regex_match(word, regex("([0-9]*\.[0-9]+|[0-9]+)")) && isChars){
                 pair<string,string> pr;
                 if(word == to_string(stoi(word))){
                     pr = make_pair(word,"Constant of int type");
@@ -137,6 +170,10 @@ void LexicalAnalyser::Analyse() {
                 word.clear();
                 continue;
             }
+
+            errorsTable.insert(make_pair("input.java:"+to_string(line.first) + ":" + to_string(line.second.find(ch)-word.length()+1),"Unknown variable!"));
+            word.clear();
+
         }
     }
 
@@ -145,12 +182,10 @@ void LexicalAnalyser::Analyse() {
     PrintTables("Key Words", keyWordsTable);
     PrintTables("Operators", operatorsTable);
     PrintTables("Constants", constantsTable);
+    if(errorsTable.empty()){
+        cout << "Code is clear! Nice work!" << endl;
+    } else {
+        PrintTables("Errors", errorsTable);
+    }
 
-}
-
-bool LexicalAnalyser::isNum(string &word) {
-    char * pEnd = NULL;
-    double d = strtod(word.c_str(), &pEnd);
-
-    return *pEnd;
 }
