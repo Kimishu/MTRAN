@@ -1,13 +1,5 @@
 int factorial(int number){
 
-    int int;
-    djgdjgdgh;
-    double case;
-
-    int 9fh= 15;
-
-    9fh++;
-
     if(number < 0){
         return 0;
     }
