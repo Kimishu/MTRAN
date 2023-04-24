@@ -5,7 +5,7 @@
 #include "LexicalAnalyser.h"
 
 LexicalAnalyser::LexicalAnalyser() {
-    defaultPath = R"(D:\Programs\bsuir\6sem\mtran\lab2\input.java)";
+    defaultPath = R"(D:\Programs\bsuir\6sem\mtran\dev\MTRAN\lab3\input.java)";
 }
 
 [[maybe_unused]] LexicalAnalyser::LexicalAnalyser(const string &path) {
@@ -51,6 +51,10 @@ void LexicalAnalyser::Analyse() {
             bool isChars = any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;});
             bool isOperator = any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](const pair<string,string>& pr){return string(1,ch) == pr.first;});
 
+            if(isChars && ch != ' ' && word.empty()){
+                tokens.push_back(string(1,ch));
+            }
+
             if(!isChars && !isOperator){
                 word+=ch;
                 if(!any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](const pair<string,string>& pr){return string(1,*(&ch+1)) == pr.first;})) {
@@ -83,6 +87,9 @@ void LexicalAnalyser::Analyse() {
                                     [&word](const pair<string, string> &pr) { return word == pr.first; })) {
                             variablesTable.insert(make_pair(word, "is a variable"));
                             tokens.push_back(word);
+                            if(isChars && ch != ' '){
+                                tokens.push_back(string(1,ch));
+                            }
                         } else {
                             string type;
                             if (any_of(keyWordsPattern.begin(), keyWordsPattern.end(),
@@ -109,6 +116,9 @@ void LexicalAnalyser::Analyse() {
             if (any_of(variablesTable.begin(), variablesTable.end(),
                        [&word](const pair<string, string> &pr) { return word == pr.first; })) {
                 tokens.push_back(word);
+                if(isChars && ch != ' '){
+                    tokens.push_back(string(1,ch));
+                }
                 word.clear();
                 continue;
             }
@@ -123,6 +133,9 @@ void LexicalAnalyser::Analyse() {
             })) {
                 variablesTypesTable.insert(make_pair(word, type));
                 tokens.push_back(word);
+                if(isChars && ch != ' '){
+                    tokens.push_back(string(1,ch));
+                }
                 word.clear();
                 isVariable = true;
 
@@ -138,6 +151,9 @@ void LexicalAnalyser::Analyse() {
             })){
                 keyWordsTable.insert(make_pair(word,type));
                 tokens.push_back(word);
+                if(isChars && ch != ' '){
+                    tokens.push_back(string(1,ch));
+                }
                 word.clear();
                 continue;
             }
@@ -151,6 +167,9 @@ void LexicalAnalyser::Analyse() {
             })){
                 operatorsTable.insert(make_pair(word,type));
                 tokens.push_back(word);
+                if(isChars && ch != ' '){
+                    tokens.push_back(string(1,ch));
+                }
                 word.clear();
                 continue;
             }
@@ -170,7 +189,9 @@ void LexicalAnalyser::Analyse() {
 
                 constantsTable.insert(pr);
                 tokens.push_back(word);
-
+                if(isChars && ch != ' '){
+                    tokens.push_back(string(1,ch));
+                }
                 word.clear();
                 continue;
             }
