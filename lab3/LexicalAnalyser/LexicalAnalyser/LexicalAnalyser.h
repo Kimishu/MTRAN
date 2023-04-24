@@ -13,6 +13,7 @@
 #include <sstream>
 #include <regex>
 #include <list>
+#include "Token/Token.h"
 
 using namespace std;
 
@@ -51,9 +52,6 @@ private:
             {"continue","is a jump statement"},
             {"goto","is a jump statement"},
             //PRIVACY STATEMENT
-
-
-
     };
 
     map<string,string> operatorsPattern = {
@@ -100,7 +98,7 @@ private:
     map<string,string> constantsTable;
     map<string,string> errorsTable;
 
-    list<string> tokens;
+    list<unique_ptr<Token>> tokens;
 
     vector<pair<int,string>> fileLines;
     string defaultPath;

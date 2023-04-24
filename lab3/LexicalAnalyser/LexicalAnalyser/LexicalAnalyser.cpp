@@ -52,7 +52,7 @@ void LexicalAnalyser::Analyse() {
             bool isOperator = any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](const pair<string,string>& pr){return string(1,ch) == pr.first;});
 
             if(isChars && ch != ' ' && word.empty()){
-                tokens.push_back(string(1,ch));
+                tokens.push_back(make_unique<Token>("Special symbol", string(1,ch)));
             }
 
             if(!isChars && !isOperator){
@@ -86,9 +86,9 @@ void LexicalAnalyser::Analyse() {
                             !any_of(variablesPattern.begin(), variablesPattern.end(),
                                     [&word](const pair<string, string> &pr) { return word == pr.first; })) {
                             variablesTable.insert(make_pair(word, "is a variable"));
-                            tokens.push_back(word);
+                            tokens.push_back(make_unique<Token>("is a variable", word));
                             if(isChars && ch != ' '){
-                                tokens.push_back(string(1,ch));
+                                tokens.push_back(make_unique<Token>("Special symbol", string(1,ch)));
                             }
                         } else {
                             string type;
@@ -115,9 +115,9 @@ void LexicalAnalyser::Analyse() {
             }
             if (any_of(variablesTable.begin(), variablesTable.end(),
                        [&word](const pair<string, string> &pr) { return word == pr.first; })) {
-                tokens.push_back(word);
+                tokens.push_back(make_unique<Token>("is a variable", word));
                 if(isChars && ch != ' '){
-                    tokens.push_back(string(1,ch));
+                    tokens.push_back(make_unique<Token>("Special symbol", string(1,ch)));
                 }
                 word.clear();
                 continue;
@@ -132,9 +132,9 @@ void LexicalAnalyser::Analyse() {
                 return false;
             })) {
                 variablesTypesTable.insert(make_pair(word, type));
-                tokens.push_back(word);
+                tokens.push_back(make_unique<Token>(type, word));
                 if(isChars && ch != ' '){
-                    tokens.push_back(string(1,ch));
+                    tokens.push_back(make_unique<Token>("Special symbol", string(1,ch)));
                 }
                 word.clear();
                 isVariable = true;
@@ -150,9 +150,9 @@ void LexicalAnalyser::Analyse() {
                 return false;
             })){
                 keyWordsTable.insert(make_pair(word,type));
-                tokens.push_back(word);
+                tokens.push_back(make_unique<Token>(type, word));
                 if(isChars && ch != ' '){
-                    tokens.push_back(string(1,ch));
+                    tokens.push_back(make_unique<Token>("Special symbol", string(1,ch)));
                 }
                 word.clear();
                 continue;
@@ -166,9 +166,9 @@ void LexicalAnalyser::Analyse() {
                 return false;
             })){
                 operatorsTable.insert(make_pair(word,type));
-                tokens.push_back(word);
+                tokens.push_back(make_unique<Token>(type, word));
                 if(isChars && ch != ' '){
-                    tokens.push_back(string(1,ch));
+                    tokens.push_back(make_unique<Token>("Special symbol", string(1,ch)));
                 }
                 word.clear();
                 continue;
@@ -188,9 +188,9 @@ void LexicalAnalyser::Analyse() {
                 }
 
                 constantsTable.insert(pr);
-                tokens.push_back(word);
+                tokens.push_back(make_unique<Token>(pr.second, word));
                 if(isChars && ch != ' '){
-                    tokens.push_back(string(1,ch));
+                    tokens.push_back(make_unique<Token>("Special symbol", string(1,ch)));
                 }
                 word.clear();
                 continue;
@@ -212,8 +212,8 @@ void LexicalAnalyser::Analyse() {
         PrintTables("Errors", errorsTable);
     }
 
-    for(string& token : tokens){
-        cout << token << endl;
+    for(unique_ptr<Token>& token : tokens){
+        cout << token.get()->value << endl;
     }
 
 }
