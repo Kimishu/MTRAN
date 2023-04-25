@@ -41,7 +41,7 @@ private:
             {"else","is a selection statement"},
             {"switch","is a selection statement"},
             {"case","is a selection statement"},
-            {"deafult","is a selection statement"},
+            {"default","is a selection statement"},
             //ITERATION STATEMENT
             {"for","is an iteration statement"},
             {"do","is an iteration statement"},
