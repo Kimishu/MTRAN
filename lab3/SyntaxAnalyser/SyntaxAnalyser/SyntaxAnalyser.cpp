@@ -7,10 +7,14 @@
 SyntaxAnalyser::SyntaxAnalyser(LexicalAnalyser lexer, list<Token> tokens) {
     this->lexer = lexer;
     this->tokens = tokens;
+    pos = 0;
 }
 
 Token SyntaxAnalyser::Match(list<string> tokenTypes) {
-    return Token(__cxx11::basic_string(), __cxx11::basic_string());
+    if(pos < tokens.size()){
+
+    }
+    return nullptr;
 }
 
 Token SyntaxAnalyser::Require(list<string> tokenTypes) {

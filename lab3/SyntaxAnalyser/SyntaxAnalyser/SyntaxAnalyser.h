@@ -6,13 +6,14 @@
 #define LAB3_SYNTAXANALYSER_H
 
 #include <list>
-#include "Token/Token.h"
-#include "LexicalAnalyser/LexicalAnalyser.h"
+#include "Token.h"
+#include "LexicalAnalyser.h"
 
 class SyntaxAnalyser {
 
     LexicalAnalyser lexer;
     list<Token> tokens;
+    int pos;
 
 public:
     SyntaxAnalyser(LexicalAnalyser lexer, list<Token> tokens);
