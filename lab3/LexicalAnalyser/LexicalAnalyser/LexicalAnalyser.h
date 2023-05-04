@@ -104,7 +104,7 @@ public:
     map<string,string> constantsTable;
     map<string,string> errorsTable;
 
-    //vector<unique_ptr<Token>> tokens;
+    vector<shared_ptr<Token>> tokens;
 
 
     LexicalAnalyser();

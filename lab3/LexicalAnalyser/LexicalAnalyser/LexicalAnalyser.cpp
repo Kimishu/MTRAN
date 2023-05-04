@@ -5,7 +5,8 @@
 #include "LexicalAnalyser.h"
 
 LexicalAnalyser::LexicalAnalyser() {
-    defaultPath = R"(D:\Programs\bsuir\6sem\mtran\dev\MTRAN\lab3\input.java)";
+    //defaultPath = R"(D:\Programs\bsuir\6sem\mtran\dev\MTRAN\lab3\input.java)";
+    defaultPath = R"(D:\Programs\6sem\MTRAN\dev\MTRAN\lab3\input.java)";
 }
 
 [[maybe_unused]] LexicalAnalyser::LexicalAnalyser(const string &path) {
@@ -52,7 +53,7 @@ void LexicalAnalyser::Analyse() {
             bool isOperator = any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](const pair<string,string>& pr){return string(1,ch) == pr.first;});
 
             if(isChars && ch != ' ' && word.empty()){
-                //tokens.emplace_back(make_unique<Token>("Special symbol", string(1,ch)));
+                tokens.emplace_back(make_shared<Token>("Special symbol", string(1,ch)));
             }
 
             if(!isChars && !isOperator){
@@ -86,9 +87,9 @@ void LexicalAnalyser::Analyse() {
                             !any_of(variablesPattern.begin(), variablesPattern.end(),
                                     [&word](const pair<string, string> &pr) { return word == pr.first; })) {
                             variablesTable.insert(make_pair(word, "is a variable"));
-                            //tokens.emplace_back(make_unique<Token>("is a variable", word));
+                            tokens.emplace_back(make_shared<Token>("is a variable", word));
                             if(isChars && ch != ' '){
-                              //  tokens.emplace_back(make_unique<Token>("Special symbol", string(1,ch)));
+                                tokens.emplace_back(make_shared<Token>("Special symbol", string(1,ch)));
                             }
                         } else {
                             string type;
@@ -115,9 +116,9 @@ void LexicalAnalyser::Analyse() {
             }
             if (any_of(variablesTable.begin(), variablesTable.end(),
                        [&word](const pair<string, string> &pr) { return word == pr.first; })) {
-                //tokens.emplace_back(make_unique<Token>("is a variable", word));
+                tokens.emplace_back(make_shared<Token>("is a variable", word));
                 if(isChars && ch != ' '){
-                  //  tokens.emplace_back(make_unique<Token>("Special symbol", string(1,ch)));
+                    tokens.emplace_back(make_shared<Token>("Special symbol", string(1,ch)));
                 }
                 word.clear();
                 continue;
@@ -132,9 +133,9 @@ void LexicalAnalyser::Analyse() {
                 return false;
             })) {
                 variablesTypesTable.insert(make_pair(word, type));
-                //tokens.emplace_back(make_unique<Token>(type, word));
+                tokens.emplace_back(make_shared<Token>(type, word));
                 if(isChars && ch != ' '){
-                  //  tokens.emplace_back(make_unique<Token>("Special symbol", string(1,ch)));
+                    tokens.emplace_back(make_shared<Token>("Special symbol", string(1,ch)));
                 }
                 word.clear();
                 isVariable = true;
@@ -150,9 +151,9 @@ void LexicalAnalyser::Analyse() {
                 return false;
             })){
                 keyWordsTable.insert(make_pair(word,type));
-                //tokens.emplace_back(make_unique<Token>(type, word));
+                tokens.emplace_back(make_shared<Token>(type, word));
                 if(isChars && ch != ' '){
-                  //  tokens.emplace_back(make_unique<Token>("Special symbol", string(1,ch)));
+                    tokens.emplace_back(make_shared<Token>("Special symbol", string(1,ch)));
                 }
                 word.clear();
                 continue;
@@ -166,9 +167,9 @@ void LexicalAnalyser::Analyse() {
                 return false;
             })){
                 operatorsTable.insert(make_pair(word,type));
-                //tokens.emplace_back(make_unique<Token>(type, word));
+                tokens.emplace_back(make_shared<Token>(type, word));
                 if(isChars && ch != ' '){
-                  //  tokens.emplace_back(make_unique<Token>("Special symbol", string(1,ch)));
+                    tokens.emplace_back(make_shared<Token>("Special symbol", string(1,ch)));
                 }
                 word.clear();
                 continue;
@@ -188,9 +189,9 @@ void LexicalAnalyser::Analyse() {
                 }
 
                 constantsTable.insert(pr);
-                //tokens.emplace_back(make_unique<Token>(pr.second, word));
+                tokens.emplace_back(make_shared<Token>(pr.second, word));
                 if(isChars && ch != ' '){
-                  //  tokens.emplace_back(make_unique<Token>("Special symbol", string(1,ch)));
+                    tokens.emplace_back(make_shared<Token>("Special symbol", string(1,ch)));
                 }
                 word.clear();
                 continue;
@@ -212,8 +213,8 @@ void LexicalAnalyser::Analyse() {
         PrintTables("Errors", errorsTable);
     }
 
-//    for(unique_ptr<Token>& token : tokens){
-//        cout << token.get()->value << endl;
-//    }
+    for(shared_ptr<Token>& token : tokens){
+        cout << token.get()->value << endl;
+    }
 
 }
