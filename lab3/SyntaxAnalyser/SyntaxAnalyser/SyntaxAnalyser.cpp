@@ -3,16 +3,17 @@
 //
 
 #include "SyntaxAnalyser.h"
+#include "StatementsNode.h"
 
-SyntaxAnalyser::SyntaxAnalyser(LexicalAnalyser lexer, vector<Token> tokens) {
-    this->lexer = make_unique<LexicalAnalyser>(lexer);
-    this->tokens = tokens;
+SyntaxAnalyser::SyntaxAnalyser(LexicalAnalyser lexer) {
+    this->lexer = lexer;
+    this->tokens = lexer.tokens;
     pos = 0;
 }
 
-unique_ptr<Token> SyntaxAnalyser::Match(vector<string> tokenTypes) {
+shared_ptr<Token> SyntaxAnalyser::Match(vector<string> tokenTypes) {
     if(pos < tokens.size()){
-        unique_ptr<Token> token = make_unique<Token>(tokens[pos]);
+        shared_ptr<Token> token = tokens[pos];
 
         if(find(tokenTypes.begin(), tokenTypes.end(), token->value) != tokenTypes.end()){
             return token;
@@ -22,8 +23,8 @@ unique_ptr<Token> SyntaxAnalyser::Match(vector<string> tokenTypes) {
     return nullptr;
 }
 
-unique_ptr<Token> SyntaxAnalyser::Require(vector<string> tokenTypes) {
-    unique_ptr<Token> token = Match(tokenTypes);
+shared_ptr<Token> SyntaxAnalyser::Require(vector<string> tokenTypes) {
+    shared_ptr<Token> token = Match(tokenTypes);
 
     if(!token){
         throw ("на позиции " + to_string(pos) + " ожидается " + tokenTypes[0]);
@@ -43,12 +44,58 @@ vector<string> SyntaxAnalyser::getVector(map<string, string> pattern) {
     return result;
 }
 
-//Node SyntaxAnalyser::ParseCode() {
-//
-//    StatementsNode root;
-//
-//    while (pos < tokens.size()){
-//
-//    }
-//
-//}
+//Function parsing block
+
+FunctionNode SyntaxAnalyser::ParseFunction(){
+
+    return FunctionNode()
+
+}
+
+vector<Token> SyntaxAnalyser::ParseFunctionDefinition() {
+    vector<Token> parameters;
+
+    if
+}
+
+shared_ptr<Node> SyntaxAnalyser::ParseExpression() {
+
+    if(Match(getVector(lexer.variablesTypesTable)) != nullptr){
+
+        shared_ptr<Token> variablesToken = Match(getVector(lexer.variablesTable));
+
+        if(Match(vector<string>{"("}) != nullptr){
+
+            vector<Token> parameters = ParseFunctionDefinition();
+
+        } else{
+
+        }
+
+    }
+
+    return shared_ptr<Node>();
+}
+
+void SyntaxAnalyser::PrintTree() {
+
+}
+
+Node SyntaxAnalyser::ParseCode() {
+
+    StatementsNode root;
+
+    while (pos < tokens.size()){
+        if(Match(vector<string>{"}"}) != nullptr){
+            return root;
+        }
+        pos--;
+        shared_ptr<Node> statementNode = ParseExpression();
+
+        if(statementNode != nullptr){
+            root.AddNode(statementNode.operator*());
+        }
+    }
+
+    return root;
+}

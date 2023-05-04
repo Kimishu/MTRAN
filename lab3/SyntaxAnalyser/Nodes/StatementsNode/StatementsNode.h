@@ -12,7 +12,7 @@
 using namespace std;
 
 // The root node
-class StatementsNode: Node {
+class StatementsNode: public Node {
 
     list<Node> nodes;
 

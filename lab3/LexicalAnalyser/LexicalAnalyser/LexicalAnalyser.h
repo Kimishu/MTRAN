@@ -94,6 +94,7 @@ private:
     string defaultPath;
 
     static vector<pair<int,string>> readFile(const string& path);
+    static void PrintTables(const string& tableName, map<string,string>& table);
 
 public:
 
@@ -110,7 +111,7 @@ public:
     LexicalAnalyser();
     [[maybe_unused]] explicit LexicalAnalyser(const string& path);
     void Analyse();
-    static void PrintTables(const string& tableName, map<string,string>& table);
+    void Print();
 };
 
 

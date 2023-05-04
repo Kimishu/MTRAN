@@ -5,8 +5,7 @@
 #include "LexicalAnalyser.h"
 
 LexicalAnalyser::LexicalAnalyser() {
-    //defaultPath = R"(D:\Programs\bsuir\6sem\mtran\dev\MTRAN\lab3\input.java)";
-    defaultPath = R"(D:\Programs\6sem\MTRAN\dev\MTRAN\lab3\input.java)";
+    defaultPath = R"(D:\Programs\bsuir\6sem\mtran\dev\MTRAN\lab3\input.java)";
 }
 
 [[maybe_unused]] LexicalAnalyser::LexicalAnalyser(const string &path) {
@@ -202,6 +201,9 @@ void LexicalAnalyser::Analyse() {
         }
     }
 
+}
+
+void LexicalAnalyser::Print() {
     PrintTables("Variables types", variablesTypesTable);
     PrintTables("Variables", variablesTable);
     PrintTables("Key Words", keyWordsTable);
@@ -216,5 +218,4 @@ void LexicalAnalyser::Analyse() {
     for(shared_ptr<Token>& token : tokens){
         cout << token.get()->value << endl;
     }
-
 }

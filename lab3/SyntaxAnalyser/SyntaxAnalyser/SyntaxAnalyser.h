@@ -8,23 +8,29 @@
 #include "Token.h"
 #include "LexicalAnalyser.h"
 #include "Node.h"
+#include "../Nodes/FunctionNode/FunctionNode.h"
 
 class SyntaxAnalyser {
 
-    unique_ptr<LexicalAnalyser> lexer = nullptr;
-    vector<Token> tokens;
+    LexicalAnalyser lexer;
+    vector<shared_ptr<Token>> tokens;
     int pos;
 
-public:
-    SyntaxAnalyser(LexicalAnalyser lexer, vector<Token> tokens);
-
     vector<string> getVector(map<string,string> pattern);
+    shared_ptr<Token> Match(vector<string> tokenTypes);
+    shared_ptr<Token> Require(vector<string> tokenTypes);
 
-    unique_ptr<Token> Match(vector<string> tokenTypes);
-    unique_ptr<Token> Require(vector<string> tokenTypes);
+public:
 
+    SyntaxAnalyser(LexicalAnalyser lexer);
     Node ParseCode();
+    void PrintTree();
 
+    shared_ptr<Node> ParseExpression();
+
+    vector<Token> ParseFunctionDefinition();
+
+    FunctionNode ParseFunction();
 };
 
 

@@ -1,12 +1,16 @@
 #include "LexicalAnalyser.h"
+#include "SyntaxAnalyser.h"
 
 using namespace std;
 
-
 int main() {
 
-   LexicalAnalyser ls;
-   ls.Analyse();
+   LexicalAnalyser lexer;
+   lexer.Analyse();
+
+   SyntaxAnalyser parser(lexer);
+   parser.PrintTree();
+
 
    return 0;
 }
