@@ -12,8 +12,7 @@
 #include <algorithm>
 #include <sstream>
 #include <regex>
-#include <list>
-#include "Token/Token.h"
+#include "Token.h"
 
 using namespace std;
 
@@ -91,6 +90,13 @@ private:
             ':'};
 
 
+    vector<pair<int,string>> fileLines;
+    string defaultPath;
+
+    static vector<pair<int,string>> readFile(const string& path);
+
+public:
+
     map<string, string> variablesTypesTable;
     map<string, string> variablesTable;
     map<string,string> keyWordsTable;
@@ -98,14 +104,8 @@ private:
     map<string,string> constantsTable;
     map<string,string> errorsTable;
 
-    list<unique_ptr<Token>> tokens;
+    vector<unique_ptr<Token>> tokens;
 
-    vector<pair<int,string>> fileLines;
-    string defaultPath;
-
-    static vector<pair<int,string>> readFile(const string& path);
-
-public:
     LexicalAnalyser();
 
     [[maybe_unused]] explicit LexicalAnalyser(const string& path);

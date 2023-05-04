@@ -5,23 +5,25 @@
 #ifndef LAB3_SYNTAXANALYSER_H
 #define LAB3_SYNTAXANALYSER_H
 
-#include <list>
 #include "Token.h"
 #include "LexicalAnalyser.h"
+#include "Node.h"
 
 class SyntaxAnalyser {
 
     LexicalAnalyser lexer;
-    list<Token> tokens;
+    vector<Token> tokens;
     int pos;
 
 public:
-    SyntaxAnalyser(LexicalAnalyser lexer, list<Token> tokens);
+    SyntaxAnalyser(LexicalAnalyser lexer, vector<Token> tokens);
 
-    Token Match(list<string> tokenTypes);
-    Token Require(list<string> tokenTypes);
+    vector<string> getVector(map<string,string> pattern);
 
-    list<string> getList(map<string,string> pattern);
+    unique_ptr<Token> Match(vector<string> tokenTypes);
+    unique_ptr<Token> Require(vector<string> tokenTypes);
+
+    Node ParseCode();
 
 };
 

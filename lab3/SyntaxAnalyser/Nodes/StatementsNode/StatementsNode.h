@@ -5,7 +5,7 @@
 #ifndef LAB3_STATEMENTSNODE_H
 #define LAB3_STATEMENTSNODE_H
 
-#include "../Node/Node.h"
+#include "Node.h"
 #include <iostream>
 #include <list>
 

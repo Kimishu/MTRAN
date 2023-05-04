@@ -3,31 +3,53 @@
 //
 
 #include "SyntaxAnalyser.h"
+#include "StatementsNode.h"
 
-SyntaxAnalyser::SyntaxAnalyser(LexicalAnalyser lexer, list<Token> tokens) {
+SyntaxAnalyser::SyntaxAnalyser(LexicalAnalyser lexer, vector<Token> tokens) {
     this->lexer = lexer;
     this->tokens = tokens;
     pos = 0;
 }
 
-Token SyntaxAnalyser::Match(list<string> tokenTypes) {
+unique_ptr<Token> SyntaxAnalyser::Match(vector<string> tokenTypes) {
     if(pos < tokens.size()){
+        unique_ptr<Token> token = make_unique<Token>(tokens[pos]);
 
+        if(find(tokenTypes.begin(), tokenTypes.end(), token->value) != tokenTypes.end()){
+            return token;
+        }
     }
+
     return nullptr;
 }
 
-Token SyntaxAnalyser::Require(list<string> tokenTypes) {
-    return Token(__cxx11::basic_string(), __cxx11::basic_string());
+unique_ptr<Token> SyntaxAnalyser::Require(vector<string> tokenTypes) {
+    unique_ptr<Token> token = Match(tokenTypes);
+
+    if(!token){
+        throw ("на позиции " + to_string(pos) + " ожидается " + tokenTypes[0]);
+    }
+
+    return token;
 }
 
-list<string> SyntaxAnalyser::getList(map<string, string> pattern) {
+vector<string> SyntaxAnalyser::getVector(map<string, string> pattern) {
 
-    list<string> result;
+    vector<string> result;
 
     for(const pair<string,string>& pr: pattern){
         result.push_back(pr.first);
     }
 
-    return list<string>();
+    return result;
 }
+
+//Node SyntaxAnalyser::ParseCode() {
+//
+//    StatementsNode root;
+//
+//    while (pos < tokens.size()){
+//
+//    }
+//
+//}
