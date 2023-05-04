@@ -104,10 +104,10 @@ public:
     map<string,string> constantsTable;
     map<string,string> errorsTable;
 
-    vector<unique_ptr<Token>> tokens;
+    //vector<unique_ptr<Token>> tokens;
+
 
     LexicalAnalyser();
-
     [[maybe_unused]] explicit LexicalAnalyser(const string& path);
     void Analyse();
     static void PrintTables(const string& tableName, map<string,string>& table);

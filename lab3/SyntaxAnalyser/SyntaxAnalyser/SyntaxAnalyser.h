@@ -11,7 +11,7 @@
 
 class SyntaxAnalyser {
 
-    LexicalAnalyser lexer;
+    unique_ptr<LexicalAnalyser> lexer = nullptr;
     vector<Token> tokens;
     int pos;
 

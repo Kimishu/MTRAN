@@ -2,18 +2,25 @@
 
 using namespace std;
 
+class S{
+
+    LexicalAnalyser ls;
+
+public:
+    S(LexicalAnalyser ls){
+        this->ls = ls;
+
+    }
+};
 
 
 int main() {
 
-//    LexicalAnalyser ls;
-    //ls.Analyse();
+   LexicalAnalyser ls;
+//    ls.Analyse();
 
-    vector<int> a = {1};
+    S s(ls);
 
-    if(find(a.begin(), a.end(), 1) != a.end()){
-        cout << "find" << endl;
-    }
 
 
 
