@@ -9,7 +9,7 @@
 #include "Node.h"
 #include "Token.h"
 
-class BinaryOperationNode: Node {
+class BinaryOperationNode: public Node {
 
     Token binaryOperator;
 

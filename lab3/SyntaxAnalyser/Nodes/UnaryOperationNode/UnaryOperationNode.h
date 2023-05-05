@@ -9,7 +9,7 @@
 #include "Node.h"
 #include "Token.h"
 
-class UnaryOperationNode: Node {
+class UnaryOperationNode: public Node {
     Token unaryOperator;
     Node operand;
 

@@ -9,7 +9,6 @@ int main() {
    lexer.Analyse();
 
    SyntaxAnalyser parser(lexer);
-   parser.PrintTree();
 
 
    return 0;

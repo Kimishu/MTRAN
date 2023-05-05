@@ -9,7 +9,7 @@
 #include "Node.h"
 #include "Token.h"
 
-class LiteralNode: Node {
+class LiteralNode: public Node {
 
     Token number;
 

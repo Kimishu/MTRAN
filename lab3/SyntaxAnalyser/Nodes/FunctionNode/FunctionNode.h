@@ -18,7 +18,6 @@ class FunctionNode: public Node{
 
 public:
     FunctionNode(Token function, vector<Token> parameters, Node body);
-
 };
 
 

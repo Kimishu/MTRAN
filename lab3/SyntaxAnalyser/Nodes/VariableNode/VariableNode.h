@@ -9,7 +9,7 @@
 #include "Node.h"
 #include "Token.h"
 
-class VariableNode: Node {
+class VariableNode: public Node {
 
     Token variable;
 
