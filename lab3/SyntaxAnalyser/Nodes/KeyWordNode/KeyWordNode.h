@@ -9,7 +9,7 @@
 #include "Node.h"
 #include "Token.h"
 
-class KeyWordNode: Node {
+class KeyWordNode: public Node {
     Token keyWord;
 
 public:

@@ -8,7 +8,7 @@
 
 #include "Node.h"
 
-class ForNode: Node {
+class ForNode: public Node {
 
     Node init;
     Node condition;

@@ -3,3 +3,6 @@
 //
 
 #include "FunctionCallNode.h"
+
+FunctionCallNode::FunctionCallNode(Token function, vector<Node> parameters): function(function), parameters(parameters) {
+}

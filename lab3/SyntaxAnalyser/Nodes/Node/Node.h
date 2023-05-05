@@ -8,6 +8,8 @@
 
 class Node {
 
+public:
+    Node();
 };
 
 

@@ -7,16 +7,16 @@
 
 #include "Node.h"
 #include <iostream>
-#include <list>
+#include <vector>
 
 using namespace std;
 
 // The root node
 class StatementsNode: public Node {
 
-    list<Node> nodes;
 
 public:
+    vector<Node> nodes;
     void AddNode(Node);
 };
 

@@ -10,6 +10,8 @@
 #include "Node.h"
 #include "FunctionNode.h"
 #include "FunctionCallNode.h"
+#include "KeyWordNode.h"
+#include "StatementsNode.h"
 
 class SyntaxAnalyser {
 
@@ -29,21 +31,35 @@ class SyntaxAnalyser {
 
     //Function parsing
     vector<Token> ParseFunctionParameters();
-    FunctionNode ParseFunctionDefinition(shared_ptr<Token> functionName);
+    FunctionNode ParseFunctionDefinition(Token functionName);
     FunctionCallNode ParseFunctionCall(shared_ptr<Token> functionName);
 
     //Variable or constant parsing
     Node ParseVariableDefinition(shared_ptr<Token> variableName);
     Node ParseVariableOrLiteral();
 
-    //
+    //Loops parsing
+    Node ParseFor();
+    Node ParseWhile();
+
+    //If/Switch
+    Node ParseIf();
+    Node ParseSwitch();
+    Node ParseCase();
+
+    Node ParseReturn();
+
+    KeyWordNode ParseKeyWord(shared_ptr<Token> keyWord);
+
+
 
 public:
 
     //Public block of functions, USER MUST USE ONLY THIS FUNCTIONS!
     SyntaxAnalyser(LexicalAnalyser lexer);
-    Node ParseCode();
-    void PrintTree();
+    StatementsNode ParseCode();
+    void PrintTree(Node root);
+
 };
 
 

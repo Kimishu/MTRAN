@@ -6,7 +6,17 @@
 #define LAB3_FUNCTIONCALLNODE_H
 
 
-class FunctionCallNode {
+#include <vector>
+#include "Node.h"
+#include "Token.h"
+
+class FunctionCallNode: public Node{
+
+    Token function;
+    vector<Node> parameters;
+
+public:
+    FunctionCallNode(Token function, vector<Node> parameters);
 
 };
 

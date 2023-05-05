@@ -8,7 +8,7 @@
 
 #include "Node.h"
 
-class IfNode: Node {
+class IfNode: public Node {
 
     Node condition;
     Node body;
