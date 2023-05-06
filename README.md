@@ -30,6 +30,6 @@ Current stage: Done.
 Here we will create an abstract syntax tree to check our tokens stream to compliance with syntactic norms.
 Our token expressions will be grouped into grammatical phrases.
 
-Current stage: Started (10%)
+Current stage: Done.
 ```
 

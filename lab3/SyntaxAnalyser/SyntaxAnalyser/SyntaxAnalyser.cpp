@@ -38,15 +38,10 @@ shared_ptr<Token> SyntaxAnalyser::Match(vector<string> tokenTypes) {
 shared_ptr<Token> SyntaxAnalyser::Require(vector<string> tokenTypes) {
     shared_ptr<Token> token = Match(tokenTypes);
 
-    try {
-        if (!token) {
-            throw ("на позиции " + to_string(pos) + " ожидается " + tokenTypes[0]);
-        }
+    if (!token) {
+        cout << "Before token " << "\'" << tokens[pos]->value <<"\'" << " expected token " << "\'" << tokenTypes[0] << "\'" << endl;
+        std::exit( EXIT_FAILURE );
     }
-    catch (...){
-        cout << "на позиции " + to_string(pos) + " ожидается " + tokenTypes[0] << endl;
-    }
-
 
     return token;
 }
@@ -78,36 +73,40 @@ vector<Token> SyntaxAnalyser::ParseFunctionParameters() {
 
     vector<Token> parameters;
 
-    if(Match(getVector(lexer.variablesTypesTable)) == nullptr) {
-        if (Match(vector<string>{")"}) != nullptr) {
+    if (Match(getVector(lexer.variablesTypesTable)) == nullptr) {
+        if (Match(vector < string > {")"}) != nullptr) {
             return parameters;
         }
 
-        throw "После токена " + tokens[pos-1]->value + " ожидалась ) или тип переменной";
+        cout << "After token " + tokens[pos - 1]->value + " expected ')' or variable type" << endl;
+        std::exit( EXIT_FAILURE );
     } else {
 
-        shared_ptr<Token> parameter = Match(getVector(lexer.variablesTable));
+        shared_ptr <Token> parameter = Match(getVector(lexer.variablesTable));
 
-        if(parameter == nullptr){
-            throw "После токена "+tokens[pos-1]->value + " ожидалось имя переменной";
+        if (parameter == nullptr) {
+            cout << "After token " + tokens[pos - 1]->value + " expected a variable name" << endl;
+            std::exit( EXIT_FAILURE );
         }
         parameters.push_back(parameter.operator*());
 
-        shared_ptr<Token> token = Match(vector<string>{","});
+        shared_ptr <Token> token = Match(vector < string > {","});
 
-        while (token != nullptr){
+        while (token != nullptr) {
 
-            if(Match(getVector(lexer.variablesTypesTable)) == nullptr){
-                throw "Ожидался тип перменной перед " + tokens[pos]->value;
+            if (Match(getVector(lexer.variablesTypesTable)) == nullptr) {
+                cout << "Expected a variable type before " + tokens[pos]->value << endl;
+                std::exit(EXIT_FAILURE);
             }
 
             parameters.push_back(Match(getVector(lexer.variablesTable)).operator*());
-            token = Match(vector<string>{","});
+            token = Match(vector < string > {","});
         }
 
         return parameters;
     }
 }
+
 
 shared_ptr<Node> SyntaxAnalyser::ParseFunctionCall(shared_ptr<Token> functionName) {
 
@@ -165,8 +164,12 @@ shared_ptr<Node> SyntaxAnalyser::ParseVariableOrLiteral() {
             token = Match(getVector(lexer.variablesTable));
             if(Match(vector<string>{"("})){
                 return ParseFunctionCall(token);
-            } else {
+            }
+            if(token != nullptr){
                 return make_shared<VariableNode>(token.operator*());
+            } else {
+                cout << "Expected number or variable instead of " << "\'" << tokens[pos]->value << "\'" << endl;
+                std::exit(EXIT_FAILURE);
             }
         }
     }
