@@ -5,7 +5,8 @@
 #include "LexicalAnalyser.h"
 
 LexicalAnalyser::LexicalAnalyser() {
-    defaultPath = R"(D:\Programs\bsuir\6sem\mtran\dev\MTRAN\lab3\input.java)";
+    //defaultPath = R"(D:\Programs\bsuir\6sem\mtran\dev\MTRAN\lab3\input.java)";
+    defaultPath = R"(D:\Programs\6sem\MTRAN\dev\MTRAN\lab3\input.java)";
 }
 
 [[maybe_unused]] LexicalAnalyser::LexicalAnalyser(const string &path) {
@@ -74,6 +75,10 @@ void LexicalAnalyser::Analyse() {
                 continue;
             }
 
+            if(!errorsTable.empty()){
+                PrintTables("Errors", errorsTable);
+                std::exit( EXIT_FAILURE );
+            }
 
             if (isVariable) {
                 if(isdigit(word[0])){
@@ -195,6 +200,7 @@ void LexicalAnalyser::Analyse() {
                 word.clear();
                 continue;
             }
+
 
             errorsTable.insert(make_pair("input.java:"+to_string(line.first) + ":" + to_string(line.second.find(ch)-word.length()+1),"Unknown variable!"));
             word.clear();

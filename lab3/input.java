@@ -21,7 +21,7 @@ int factorial(int number){
     }
 
     int b = 5;
-    int c = b++;
+    int c = b ++;
 
 
     return number * factorial(number-1);
