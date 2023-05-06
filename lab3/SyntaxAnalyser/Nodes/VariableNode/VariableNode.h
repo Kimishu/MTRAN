@@ -11,11 +11,12 @@
 
 class VariableNode: public Node {
 
+public:
+
     Token variable;
 
-public:
     VariableNode(Token variable);
-
+    NodeType getType();
 };
 
 

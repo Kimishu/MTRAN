@@ -4,5 +4,9 @@
 
 #include "ForNode.h"
 
-ForNode::ForNode(Node init, Node condition, Node step, Node body): init(init), condition(condition), step(step), body(body) {
+ForNode::ForNode(shared_ptr<Node> init, shared_ptr<Node> condition, shared_ptr<Node> step, shared_ptr<Node> body): init(init), condition(condition), step(step), body(body) {
+}
+
+NodeType ForNode::getType() {
+    return For;
 }

@@ -10,11 +10,12 @@
 #include "Token.h"
 
 class KeyWordNode: public Node {
-    Token keyWord;
 
 public:
-    KeyWordNode(Token keyWord);
+    Token keyWord;
 
+    KeyWordNode(Token keyWord);
+    NodeType getType();
 };
 
 

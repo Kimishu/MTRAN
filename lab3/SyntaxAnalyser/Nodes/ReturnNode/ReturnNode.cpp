@@ -4,5 +4,9 @@
 
 #include "ReturnNode.h"
 
-ReturnNode::ReturnNode(Node statement): statement(statement) {
+ReturnNode::ReturnNode(shared_ptr<Node> statement): statement(statement) {
+}
+
+NodeType ReturnNode::getType() {
+    return Return;
 }

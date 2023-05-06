@@ -4,5 +4,9 @@
 
 #include "SwitchNode.h"
 
-SwitchNode::SwitchNode(Token variable, Node body): variable(variable), body(body) {
+SwitchNode::SwitchNode(Token variable, shared_ptr<Node> body): variable(variable), body(body) {
+}
+
+NodeType SwitchNode::getType() {
+    return Switch;
 }

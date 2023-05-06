@@ -11,13 +11,15 @@
 
 class BinaryOperationNode: public Node {
 
+public:
     Token binaryOperator;
 
-    Node leftNode;
-    Node rightNode;
+    shared_ptr<Node> leftNode;
+    shared_ptr<Node> rightNode;
 
-public:
-    BinaryOperationNode(Token binaryOperator, Node leftNode, Node rightNode);
+    BinaryOperationNode(Token binaryOperator, shared_ptr<Node> leftNode, shared_ptr<Node> rightNode);
+
+    NodeType getType();
 
 };
 

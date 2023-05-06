@@ -7,3 +7,7 @@
 KeyWordNode::KeyWordNode(Token keyWord): keyWord(keyWord) {
 
 }
+
+NodeType KeyWordNode::getType() {
+    return KeyWord;
+}

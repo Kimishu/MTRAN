@@ -10,11 +10,13 @@
 
 class WhileNode: public Node{
 
-    Node condition;
-    Node body;
-
 public:
-    WhileNode(Node condition, Node body);
+
+    shared_ptr<Node> condition;
+    shared_ptr<Node> body;
+
+    WhileNode(shared_ptr<Node> condition, shared_ptr<Node> body);
+    NodeType getType();
 };
 
 

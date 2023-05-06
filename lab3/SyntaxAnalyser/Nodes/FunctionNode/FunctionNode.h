@@ -12,12 +12,13 @@
 
 class FunctionNode: public Node{
 
+public:
     Token function;
     vector<Token> parameters;
-    Node body;
+    shared_ptr<Node> body;
 
-public:
-    FunctionNode(Token function, vector<Token> parameters, Node body);
+    FunctionNode(Token function, vector<Token> parameters, shared_ptr<Node> body);
+    NodeType getType();
 };
 
 

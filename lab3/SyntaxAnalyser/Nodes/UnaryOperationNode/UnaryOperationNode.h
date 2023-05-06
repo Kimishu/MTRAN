@@ -10,11 +10,13 @@
 #include "Token.h"
 
 class UnaryOperationNode: public Node {
-    Token unaryOperator;
-    Node operand;
 
 public:
-    UnaryOperationNode(Token unaryOperator, Node operand);
+    Token unaryOperator;
+    shared_ptr<Node> operand;
+
+    UnaryOperationNode(Token unaryOperator, shared_ptr<Node> operand);
+    NodeType getType();
 };
 
 

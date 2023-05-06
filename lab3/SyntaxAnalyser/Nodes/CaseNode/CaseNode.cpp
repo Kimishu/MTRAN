@@ -4,5 +4,9 @@
 
 #include "CaseNode.h"
 
-CaseNode::CaseNode(Node literal): literal(literal) {
+CaseNode::CaseNode(shared_ptr<Node> literal): literal(literal) {
+}
+
+NodeType CaseNode::getType() {
+    return Case;
 }

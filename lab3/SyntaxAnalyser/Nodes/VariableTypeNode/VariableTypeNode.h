@@ -9,7 +9,8 @@
 #include "Node.h"
 
 class VariableTypeNode: Node {
-
+public:
+    NodeType getType();
 };
 
 

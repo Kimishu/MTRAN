@@ -4,6 +4,10 @@
 
 #include "StatementsNode.h"
 
-void StatementsNode::AddNode(Node node) {
+void StatementsNode::AddNode(shared_ptr<Node> node) {
     nodes.push_back(node);
+}
+
+NodeType StatementsNode::getType() {
+    return Statements;
 }

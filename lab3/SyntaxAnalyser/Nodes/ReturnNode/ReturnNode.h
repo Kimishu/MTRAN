@@ -10,11 +10,12 @@
 
 class ReturnNode: public Node{
 
-    Node statement;
-
 public:
-    ReturnNode(Node statement);
 
+    shared_ptr<Node> statement;
+
+    ReturnNode(shared_ptr<Node> statement);
+    NodeType getType();
 };
 
 

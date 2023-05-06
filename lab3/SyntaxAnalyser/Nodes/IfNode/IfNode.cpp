@@ -4,8 +4,12 @@
 
 #include "IfNode.h"
 
-IfNode::IfNode(Node condition, Node body, Node elseBody): condition(condition), body(body), elseBody(elseBody) {
+IfNode::IfNode(shared_ptr<Node> condition, shared_ptr<Node> body, shared_ptr<Node> elseBody): condition(condition), body(body), elseBody(elseBody) {
 }
 
-IfNode::IfNode(Node condition, Node body): condition(condition), body(body) {
+IfNode::IfNode(shared_ptr<Node> condition, shared_ptr<Node> body): condition(condition), body(body) {
+}
+
+NodeType IfNode::getType() {
+    return If;
 }

@@ -14,6 +14,7 @@
 #include "SwitchNode.h"
 #include "CaseNode.h"
 #include "ReturnNode.h"
+#include "VariableTypeNode.h"
 
 SyntaxAnalyser::SyntaxAnalyser(LexicalAnalyser lexer) {
     this->lexer = lexer;
@@ -37,9 +38,15 @@ shared_ptr<Token> SyntaxAnalyser::Match(vector<string> tokenTypes) {
 shared_ptr<Token> SyntaxAnalyser::Require(vector<string> tokenTypes) {
     shared_ptr<Token> token = Match(tokenTypes);
 
-    if(!token){
-        throw ("на позиции " + to_string(pos) + " ожидается " + tokenTypes[0]);
+    try {
+        if (!token) {
+            throw ("на позиции " + to_string(pos) + " ожидается " + tokenTypes[0]);
+        }
     }
+    catch (...){
+        cout << "на позиции " + to_string(pos) + " ожидается " + tokenTypes[0] << endl;
+    }
+
 
     return token;
 }
@@ -57,14 +64,14 @@ vector<string> SyntaxAnalyser::getVector(map<string, string> pattern) {
 
 // Parse function block
 
-FunctionNode SyntaxAnalyser::ParseFunctionDefinition(Token functionName) {
+shared_ptr<Node> SyntaxAnalyser::ParseFunctionDefinition(Token functionName) {
     vector<Token> parameters = ParseFunctionParameters();
 
     Require(vector<string>{")"});
     Require(vector<string>{"{"});
-    Node body = ParseCode();
+    shared_ptr<Node> body = ParseCode();
 
-    return FunctionNode(functionName, parameters, body);
+    return make_shared<FunctionNode>(functionName, parameters, body);
 }
 
 vector<Token> SyntaxAnalyser::ParseFunctionParameters() {
@@ -99,62 +106,67 @@ vector<Token> SyntaxAnalyser::ParseFunctionParameters() {
         }
 
         return parameters;
-
     }
 }
 
-FunctionCallNode SyntaxAnalyser::ParseFunctionCall(shared_ptr<Token> functionName) {
+shared_ptr<Node> SyntaxAnalyser::ParseFunctionCall(shared_ptr<Token> functionName) {
 
-    vector<Node> parameters;
+    vector<shared_ptr<Node>> parameters;
     shared_ptr<Node> parameter = ParseFormula();
 
-    parameters.push_back(parameter.operator*());
+    parameters.push_back(parameter);
 
     shared_ptr<Token> token = Match(vector<string>{","});
     while (token != nullptr){
         parameter = ParseFormula();
-        parameters.push_back(parameter.operator*());
+        parameters.push_back(parameter);
         token = Match(vector<string>{","});
     }
     Require(vector<string>{")"});
-    return FunctionCallNode(functionName.operator*(), parameters);
+    return make_shared<FunctionCallNode>(functionName.operator*(), parameters);
 }
 
 //Parse variable or constant block
 
-Node SyntaxAnalyser::ParseVariableDefinition(shared_ptr<Token> variableName) {
+shared_ptr<Node> SyntaxAnalyser::ParseVariableDefinition(shared_ptr<Token> variableName) {
     vector<string> tokenTypes = {"=",";"};
 
-    VariableNode variable(variableName.operator*());
+    shared_ptr<VariableNode> variable = make_shared<VariableNode>(variableName.operator*());
 
     shared_ptr<Token> token = Require(tokenTypes);
 
     while (token != nullptr){
         if(token->value == "="){
-            return BinaryOperationNode(token.operator*(), variable,ParseFormula().operator*());
+            shared_ptr<BinaryOperationNode> binaryOperationNode = make_shared<BinaryOperationNode>(token.operator*(), variable,ParseFormula());
+
+            Require(vector<string>{";"});
+
+            return binaryOperationNode;
         }
         if(token->value == ";"){
-            return variable;
+            return make_shared<VariableNode>(variable->variable);
         }
+
+        token = Require(tokenTypes);
     }
 
 }
 
-Node SyntaxAnalyser::ParseVariableOrLiteral() {
+shared_ptr<Node> SyntaxAnalyser::ParseVariableOrLiteral() {
     shared_ptr<Token> token = Match(getVector(lexer.constantsTable));
 
     if(token != nullptr){
-        return LiteralNode(token.operator*());
+        return make_shared<LiteralNode>(token.operator*());
     } else {
         token = Match(vector<string>{"!","++","--","-"});
         if( token != nullptr){
-            return UnaryOperationNode(token.operator*(), ParseFormula().operator*());
+            return make_shared<UnaryOperationNode>(token.operator*(), ParseFormula());
         } else {
             token = Match(getVector(lexer.variablesTable));
             if(Match(vector<string>{"("})){
                 return ParseFunctionCall(token);
             } else {
-                return VariableNode(token.operator*());
+                return make_shared<VariableNode>(token.operator*());
             }
         }
     }
@@ -162,7 +174,7 @@ Node SyntaxAnalyser::ParseVariableOrLiteral() {
 
 //Parse keywords
 
-Node SyntaxAnalyser::ParseFor() {
+shared_ptr<Node> SyntaxAnalyser::ParseFor() {
 
     Require(vector<string>{"("});
     shared_ptr<Node> init = ParseFormula();
@@ -175,84 +187,83 @@ Node SyntaxAnalyser::ParseFor() {
     Require(vector<string>{")"});
 
     Require(vector<string>{"{"});
-    Node body = ParseCode();
+    shared_ptr<Node> body = ParseCode();
 
-
-    return ForNode(init.operator*(), condition.operator*(), step.operator*(), body);
+    return make_shared<ForNode>(init, condition, step, body);
 }
 
-Node SyntaxAnalyser::ParseWhile() {
-    Require(vector<string>{"("});
-    shared_ptr<Node> condition = ParseFormula();
-    Require(vector<string>{")"});
-
-    Require(vector<string>{"{"});
-    Node body = ParseCode();
-
-    return WhileNode(condition.operator*(), body);
-
-}
-
-Node SyntaxAnalyser::ParseIf() {
+shared_ptr<Node> SyntaxAnalyser::ParseWhile() {
 
     Require(vector<string>{"("});
     shared_ptr<Node> condition = ParseFormula();
     Require(vector<string>{")"});
 
     Require(vector<string>{"{"});
-    Node body = ParseCode();
+    shared_ptr<Node> body = ParseCode();
+
+    return make_shared<WhileNode>(condition, body);
+}
+
+shared_ptr<Node> SyntaxAnalyser::ParseIf() {
+
+    Require(vector<string>{"("});
+    shared_ptr<Node> condition = ParseFormula();
+    Require(vector<string>{")"});
+
+    Require(vector<string>{"{"});
+    shared_ptr<Node> body = ParseCode();
 
     if(Match(vector<string>{"else"})){
         if(Match(vector<string>{"if"})){
-            Node elseCondition = ParseIf();
-            return IfNode(condition.operator*(), body, elseCondition);
+            shared_ptr<Node> elseCondition = ParseIf();
+            return make_shared<IfNode>(condition, body, elseCondition);
         } else {
             Require(vector<string>{"{"});
-            Node elseBody = ParseCode();
-            return IfNode(condition.operator*(), body, elseBody);
+            shared_ptr<Node> elseBody = ParseCode();
+            return make_shared<IfNode>(condition, body, elseBody);
         }
     }
-    return IfNode(condition.operator*(),body);
+    return make_shared<IfNode>(condition,body);
 }
 
-Node SyntaxAnalyser::ParseSwitch() {
+shared_ptr<Node> SyntaxAnalyser::ParseSwitch() {
 
     Require(vector<string>{"("});
     shared_ptr<Token> switchCondition = Require(getVector(lexer.variablesTable));
     Require(vector<string>{")"});
 
     Require(vector<string>{"{"});
-    Node body = ParseCode();
+    shared_ptr<Node> body = ParseCode();
 
-    return SwitchNode(switchCondition.operator*(), body);
+    return make_shared<SwitchNode>(switchCondition.operator*(), body);
 }
 
-Node SyntaxAnalyser::ParseCase() {
-
-    Node node = ParseVariableOrLiteral();
+shared_ptr<Node> SyntaxAnalyser::ParseCase() {
+//HERE
+    shared_ptr<Node> node = ParseVariableOrLiteral();
 
     Require(vector<string>{":"});
 
 
-    return CaseNode(node);
+    return make_shared<CaseNode>(node);
 }
 
-Node SyntaxAnalyser::ParseReturn() {
+shared_ptr<Node> SyntaxAnalyser::ParseReturn() {
 
     shared_ptr<Node> formula = ParseFormula();
 
     Require(vector<string>{";"});
 
-    return ReturnNode(formula.operator*());
+    return make_shared<ReturnNode>(formula);
 }
 
-KeyWordNode SyntaxAnalyser::ParseKeyWord(shared_ptr<Token> keyWord) {
+shared_ptr<Node> SyntaxAnalyser::ParseKeyWord(shared_ptr<Token> keyWord) {
 
     if(keyWord->value == "break"){
         Require(vector<string>{";"});
     }
 
-    return KeyWordNode(keyWord.operator*());
+    return make_shared<KeyWordNode>(keyWord.operator*());
 }
 
 shared_ptr<Node> SyntaxAnalyser::ParseFormula() {
@@ -261,10 +272,10 @@ shared_ptr<Node> SyntaxAnalyser::ParseFormula() {
 
     while (token != nullptr) {
         if(token->value == "++" || token->value == "--"){
-            leftNode = make_shared<UnaryOperationNode>(token.operator*(),leftNode.operator*());
+            leftNode = make_shared<UnaryOperationNode>(token.operator*(),leftNode);
         } else {
             shared_ptr<Node> rightNode = ParseParentheses();
-            leftNode = make_shared<BinaryOperationNode>(token.operator*(),leftNode.operator*(),rightNode.operator*());
+            leftNode = make_shared<BinaryOperationNode>(token.operator*(),leftNode,rightNode);
         }
         token = Match(getVector(lexer.operatorsTable));
     }
@@ -279,7 +290,8 @@ shared_ptr<Node> SyntaxAnalyser::ParseParentheses() {
 
         return node;
     } else {
-        return make_shared<Node>(ParseVariableOrLiteral());
+        //HERE
+        return ParseVariableOrLiteral();
     }
 }
 
@@ -293,16 +305,11 @@ shared_ptr<Node> SyntaxAnalyser::ParseExpression() {
         //Here should be a check?
 
         if(Match(vector<string>{"("}) != nullptr){
-            FunctionNode func = ParseFunctionDefinition(variablesToken.operator*());
 
-            shared_ptr<Node> lala = make_shared<FunctionNode>(func);
-
-            return lala;
-
+            return ParseFunctionDefinition(variablesToken.operator*());
         } else{
-            pos--;
-            auto some = ParseVariableDefinition(variablesToken);
-            return make_shared<Node>(ParseVariableDefinition(variablesToken));
+
+            return ParseVariableDefinition(variablesToken);
         }
     }
 
@@ -313,25 +320,25 @@ shared_ptr<Node> SyntaxAnalyser::ParseExpression() {
 
         //LOOPS AND OTHERS
         if(token->value == "for"){
-            return make_shared<Node>(ParseFor());
+            return ParseFor();
         }
         if(token->value == "while"){
-            return make_shared<Node>(ParseWhile());
+            return ParseWhile();
         }
         if(token->value == "if"){
-            return make_shared<Node>(ParseIf());
+            return ParseIf();
         }
         if(token->value == "switch"){
-            return make_shared<Node>(ParseSwitch());
+            return ParseSwitch();
         }
         if(token->value == "case"){
-            return make_shared<Node>(ParseCase());
+            return ParseCase();
         }
         if(token->value == "return"){
-            return make_shared<Node>(ParseReturn());
+            return ParseReturn();
         }
         if(token->value == "break"){
-            return make_shared<Node>(ParseKeyWord(token));
+            return ParseKeyWord(token);
         }
 
     }
@@ -341,17 +348,17 @@ shared_ptr<Node> SyntaxAnalyser::ParseExpression() {
         shared_ptr<Token> token =  Match(getVector(lexer.variablesTable));
 
         if(Match(vector<string>{"("}) != nullptr){
-            return make_shared<Node>(ParseFunctionCall(token));
+            return ParseFunctionCall(token);
         }
 
         pos--;
-        Node leftNode = ParseVariableOrLiteral();
+        shared_ptr<Node> leftNode = ParseVariableOrLiteral();
 
         token = Match(getVector(lexer.operatorsTable));
         if (token != nullptr) {
             shared_ptr<Node> rightNode = ParseFormula();
             Require(vector<string>{";"});
-            return make_shared<Node>(BinaryOperationNode(token.operator*(), leftNode, rightNode.operator*()));
+            return make_shared<BinaryOperationNode>(token.operator*(), leftNode, rightNode);
         }
 
     }
@@ -359,30 +366,162 @@ shared_ptr<Node> SyntaxAnalyser::ParseExpression() {
     return shared_ptr<Node>();
 }
 
-StatementsNode SyntaxAnalyser::ParseCode() {
+shared_ptr<Node> SyntaxAnalyser::ParseCode() {
 
     StatementsNode root;
 
     while (pos < tokens.size()){
         if(Match(vector<string>{"}"}) != nullptr){
-            return root;
+            return make_shared<StatementsNode>(root);
         }
         shared_ptr<Node> statementNode = ParseExpression();
 
 
         if(statementNode != nullptr){
-            root.AddNode(statementNode.operator*());
+            root.AddNode(statementNode);
         }
     }
 
     cout << endl;
-    return root;
+    return make_shared<StatementsNode>(root);
 }
 
-void SyntaxAnalyser::PrintTree(Node root) {
+void SyntaxAnalyser::PrintNode(shared_ptr<Node> root, int level) {
 
+
+    if (root == nullptr) {
+        return;
+    }
+
+    if (root->getType() == Statements) {
+        shared_ptr<StatementsNode> statementsNode = dynamic_pointer_cast<StatementsNode>(root);
+
+        for (shared_ptr<Node> node: statementsNode->nodes) {
+            PrintNode(node, level);
+        }
+    }
+
+    if (root->getType() == Function) {
+        PrintTab(level);
+        shared_ptr<FunctionNode> functionNode = dynamic_pointer_cast<FunctionNode>(root);
+
+        cout << functionNode->function.value << endl;
+        PrintTab(level + 1);
+
+        for (Token &token: functionNode->parameters) {
+            cout << token.value << " ";
+        }
+
+        cout << endl;
+
+        PrintNode(functionNode->body, level + 1);
+    }
+
+    if (root->getType() == While) {
+        shared_ptr<WhileNode> whileNode = dynamic_pointer_cast<WhileNode>(root);
+        PrintTab(level);
+        cout << "while" << endl;
+        PrintNode(whileNode->condition, level + 1);
+        PrintNode(whileNode->body, level + 1);
+    }
+
+    if (root->getType() == If) {
+        shared_ptr<IfNode> ifNode = dynamic_pointer_cast<IfNode>(root);
+        PrintTab(level);
+        cout << "if" << endl;
+        PrintNode(ifNode->condition, level + 1);
+        PrintNode(ifNode->body, level + 1);
+        PrintNode(ifNode->elseBody, level + 1);
+    }
+
+    if (root->getType() == For) {
+        shared_ptr<ForNode> forNode = dynamic_pointer_cast<ForNode>(root);
+        PrintTab(level);
+        cout << "for" << endl;
+
+        PrintNode(forNode->init, level + 1);
+        PrintNode(forNode->condition, level + 1);
+        PrintNode(forNode->step, level + 1);
+        PrintNode(forNode->body, level + 1);
+    }
+
+    if (root->getType() == FunctionCall) {
+        shared_ptr<FunctionCallNode> functionCallNode = dynamic_pointer_cast<FunctionCallNode>(root);
+        PrintTab(level);
+        cout << functionCallNode->function.value << endl;
+
+        for (shared_ptr<Node> &node: functionCallNode->parameters) {
+            PrintNode(node, level + 1);
+        }
+
+    }
+
+    if (root->getType() == Switch) {
+        shared_ptr<SwitchNode> switchNode = dynamic_pointer_cast<SwitchNode>(root);
+        PrintTab(level);
+        cout << "switch" << endl;
+        PrintTab(level);
+        cout << switchNode->variable.value << endl;
+        PrintNode(switchNode->body, level + 1);
+    }
+
+    if(root->getType() == Case){
+        shared_ptr<CaseNode> caseNode = dynamic_pointer_cast<CaseNode>(root);
+        PrintTab(level);
+        cout << "case" << endl;
+        PrintTab(level);
+        PrintNode(caseNode->literal, level+1);
+    }
+
+    if (root->getType() == KeyWord) {
+        shared_ptr<KeyWordNode> keyWordNode = dynamic_pointer_cast<KeyWordNode>(root);
+        PrintTab(level);
+        cout << keyWordNode->keyWord.value << endl;
+    }
+
+    if (root->getType() == Binary) {
+        shared_ptr<BinaryOperationNode> binaryOperationNode = dynamic_pointer_cast<BinaryOperationNode>(root);
+        PrintTab(level);
+        cout << binaryOperationNode->binaryOperator.value << endl;
+        PrintNode(binaryOperationNode->leftNode, level + 1);
+        PrintNode(binaryOperationNode->rightNode, level + 1);
+    }
+
+    if (root->getType() == UnaryOperation) {
+        shared_ptr<UnaryOperationNode> unaryOperationNode = dynamic_pointer_cast<UnaryOperationNode>(root);
+        PrintTab(level);
+        cout << unaryOperationNode->unaryOperator.value << endl;
+        PrintNode(unaryOperationNode->operand, level + 1);
+    }
+
+    if (root->getType() == Literal) {
+        shared_ptr<LiteralNode> literalNode = dynamic_pointer_cast<LiteralNode>(root);
+        PrintTab(level);
+        cout << literalNode->number.value << endl;
+    }
+
+    if (root->getType() == Variable) {
+        shared_ptr<VariableNode> variableNode = dynamic_pointer_cast<VariableNode>(root);
+        PrintTab(level);
+        cout << variableNode->variable.value << endl;
+    }
+
+//    if(root->getType() == VariableType){
+//        shared_ptr<VariableTypeNode> variableTypeNode = dynamic_pointer_cast<VariableTypeNode>(root);
+//        PrintTab(level);
+//        cout << variableTypeNode.type.value();
+//    }
+
+    if (root->getType() == Return) {
+        shared_ptr<ReturnNode> returnNode = dynamic_pointer_cast<ReturnNode>(root);
+        PrintTab(level);
+        cout << "return" << endl;
+        PrintNode(returnNode->statement, level + 1);
+    }
 }
 
-
-
-
+void SyntaxAnalyser::PrintTab(int level) {
+    for(int i = 0; i < level; i++){
+        cout << "    ";
+    }
+}

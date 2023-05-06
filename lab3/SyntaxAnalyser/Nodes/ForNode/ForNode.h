@@ -10,16 +10,16 @@
 
 class ForNode: public Node {
 
-    Node init;
-    Node condition;
-    Node step;
-
-    Node body;
-
 public:
+    shared_ptr<Node> init;
+    shared_ptr<Node> condition;
+    shared_ptr<Node> step;
 
-    ForNode(Node init, Node condition, Node step, Node body);
+    shared_ptr<Node> body;
 
+
+    ForNode(shared_ptr<Node> init, shared_ptr<Node> condition, shared_ptr<Node> step, shared_ptr<Node> body);
+    NodeType getType();
 };
 
 

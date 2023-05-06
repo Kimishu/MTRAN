@@ -8,16 +8,17 @@
 #include "Node.h"
 #include <iostream>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
 // The root node
 class StatementsNode: public Node {
 
-
 public:
-    vector<Node> nodes;
-    void AddNode(Node);
+    vector<shared_ptr<Node>> nodes;
+    void AddNode(shared_ptr<Node>);
+    NodeType getType();
 };
 
 

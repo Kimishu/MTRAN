@@ -12,12 +12,12 @@
 
 class FunctionCallNode: public Node{
 
-    Token function;
-    vector<Node> parameters;
-
 public:
-    FunctionCallNode(Token function, vector<Node> parameters);
+    Token function;
+    vector<shared_ptr<Node>> parameters;
 
+    FunctionCallNode(Token function, vector<shared_ptr<Node>> parameters);
+    NodeType getType();
 };
 
 

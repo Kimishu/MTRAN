@@ -11,11 +11,11 @@
 
 class CaseNode: public Node{
 
-    Node literal;
-
 public:
-    CaseNode(Node literal);
+    shared_ptr<Node> literal;
 
+    CaseNode(shared_ptr<Node> literal);
+    NodeType getType();
 };
 
 

@@ -7,3 +7,7 @@
 VariableNode::VariableNode(Token variable) : variable(variable) {
 
 }
+
+NodeType VariableNode::getType() {
+    return Variable;
+}

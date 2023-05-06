@@ -11,11 +11,11 @@
 
 class LiteralNode: public Node {
 
+public:
     Token number;
 
-public:
     LiteralNode(Token number);
-
+    NodeType getType();
 };
 
 

@@ -6,3 +6,8 @@
 
 Node::Node() {
 }
+
+NodeType Node::getType() {
+    return Default;
+}
+

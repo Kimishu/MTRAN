@@ -10,12 +10,13 @@
 #include "Node.h"
 
 class SwitchNode: public Node{
+public:
 
     Token variable;
-    Node body;
+    shared_ptr<Node> body;
 
-public:
-    SwitchNode(Token variable, Node body);
+    SwitchNode(Token variable, shared_ptr<Node> body);
+    NodeType getType();
 };
 
 

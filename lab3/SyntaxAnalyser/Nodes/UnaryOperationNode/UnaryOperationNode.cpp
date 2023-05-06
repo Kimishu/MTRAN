@@ -4,5 +4,9 @@
 
 #include "UnaryOperationNode.h"
 
-UnaryOperationNode::UnaryOperationNode(Token unaryOperator, Node operand): unaryOperator(unaryOperator), operand(operand) {
+UnaryOperationNode::UnaryOperationNode(Token unaryOperator, shared_ptr<Node> operand): unaryOperator(unaryOperator), operand(operand) {
+}
+
+NodeType UnaryOperationNode::getType() {
+    return UnaryOperation;
 }

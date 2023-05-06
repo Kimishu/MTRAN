@@ -3,3 +3,7 @@
 //
 
 #include "VariableTypeNode.h"
+
+NodeType VariableTypeNode::getType() {
+    return VariableType;
+}

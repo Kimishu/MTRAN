@@ -4,5 +4,9 @@
 
 #include "WhileNode.h"
 
-WhileNode::WhileNode(Node condition, Node body): condition(condition), body(body) {
+WhileNode::WhileNode(shared_ptr<Node> condition, shared_ptr<Node> body): condition(condition), body(body) {
+}
+
+NodeType WhileNode::getType() {
+    return While;
 }

@@ -3,37 +3,42 @@
 
 using namespace std;
 
-
 class A{
 
-
+public:
+    virtual NodeType getType(){
+        return Default; // 8
+    }
 };
 
-class B: public A{
-    int a;
+class B:  public A{
+
+    int a = 5;
 
 public:
-    B(int a): a(a){}
+    NodeType getType() {
+        return Statements; // 10
+    }
 };
 
 shared_ptr<A> foo(){
+    return make_shared<B>();
+}
 
-
-    return make_shared<B>(5);
+shared_ptr<A> moo(shared_ptr<B> boo){
+    return boo;
 }
 
 int main() {
 
-   LexicalAnalyser lexer;
-   lexer.Analyse();
+    LexicalAnalyser lexer;
+    lexer.Analyse();
 
-   SyntaxAnalyser parser(lexer);
+    SyntaxAnalyser parser(lexer);
 
-   StatementsNode root = parser.ParseCode();
+    auto root = parser.ParseCode();
 
-   auto a = foo();
-
-   shared_ptr<B> b = dynamic_pointer_cast<B>(a);
+    parser.PrintNode(root);
 
 
    return 0;

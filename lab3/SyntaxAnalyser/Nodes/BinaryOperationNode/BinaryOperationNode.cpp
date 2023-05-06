@@ -4,7 +4,11 @@
 
 #include "BinaryOperationNode.h"
 
-BinaryOperationNode::BinaryOperationNode(Token binaryOperator, Node leftNode, Node rightNode): binaryOperator(binaryOperator),
+BinaryOperationNode::BinaryOperationNode(Token binaryOperator, shared_ptr<Node> leftNode, shared_ptr<Node> rightNode): binaryOperator(binaryOperator),
                                                                                                leftNode(leftNode),
                                                                                                rightNode(rightNode){
+}
+
+NodeType BinaryOperationNode::getType() {
+    return Binary;
 }

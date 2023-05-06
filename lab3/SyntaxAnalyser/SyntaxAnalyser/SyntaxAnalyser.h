@@ -12,6 +12,8 @@
 #include "FunctionCallNode.h"
 #include "KeyWordNode.h"
 #include "StatementsNode.h"
+#include "WhileNode.h"
+#include "ForNode.h"
 
 class SyntaxAnalyser {
 
@@ -31,35 +33,36 @@ class SyntaxAnalyser {
 
     //Function parsing
     vector<Token> ParseFunctionParameters();
-    FunctionNode ParseFunctionDefinition(Token functionName);
-    FunctionCallNode ParseFunctionCall(shared_ptr<Token> functionName);
+    shared_ptr<Node> ParseFunctionDefinition(Token functionName);
+    shared_ptr<Node> ParseFunctionCall(shared_ptr<Token> functionName);
 
     //Variable or constant parsing
-    Node ParseVariableDefinition(shared_ptr<Token> variableName);
-    Node ParseVariableOrLiteral();
+    shared_ptr<Node> ParseVariableDefinition(shared_ptr<Token> variableName);
+    shared_ptr<Node> ParseVariableOrLiteral();
 
     //Loops parsing
-    Node ParseFor();
-    Node ParseWhile();
+    shared_ptr<Node> ParseFor();
+    shared_ptr<Node> ParseWhile();
 
     //If/Switch
-    Node ParseIf();
-    Node ParseSwitch();
-    Node ParseCase();
+    shared_ptr<Node> ParseIf();
+    shared_ptr<Node> ParseSwitch();
+    shared_ptr<Node> ParseCase();
 
-    Node ParseReturn();
+    shared_ptr<Node> ParseReturn();
 
-    KeyWordNode ParseKeyWord(shared_ptr<Token> keyWord);
+    shared_ptr<Node> ParseKeyWord(shared_ptr<Token> keyWord);
 
 
+
+    void PrintTab(int level);
 
 public:
 
     //Public block of functions, USER MUST USE ONLY THIS FUNCTIONS!
     SyntaxAnalyser(LexicalAnalyser lexer);
-    StatementsNode ParseCode();
-    void PrintTree(Node root);
-
+    shared_ptr<Node> ParseCode();
+    void PrintNode(shared_ptr<Node> root, int level = 0);
 };
 
 

@@ -6,3 +6,7 @@
 
 LiteralNode::LiteralNode(Token number): number(number) {
 }
+
+NodeType LiteralNode::getType() {
+    return Literal;
+}
