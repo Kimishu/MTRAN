@@ -32,4 +32,30 @@ Our token expressions will be grouped into grammatical phrases.
 
 Current stage: Done.
 ```
+#
+- # Lab 4 - Semantic Analyser
+
+```
+Semantic analyser is used for semantic errors detection. 
+What called semantic error ? 
+
+1) Logical errors 
+    Example: 
+        -Trying to access a variable out the scope
+        -Wrong amount/type of function arguments
+2) Type erros
+    Example: 
+        -int value + bool value 
+        -string + int 
+        ...and else..
+
+Semantic analyser works with Lexical and Syntax analyser as well.
+Lexical analyser gives a tokens list to syntax analyser.
+Syntax analyser create an abstract syntax tree. 
+What about semantic analyser? 
+This analyser will parse tree and analyse each tree node (construction).
+For each error, of course. 
+
+Current stage: 10%
+```
 
