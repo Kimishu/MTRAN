@@ -75,6 +75,7 @@ private:
             {">","is comparison operator"},
             {"<=","is comparison operator"},
             {">=","is comparison operator"},
+            {"!", "is a boolean operator"}
     };
 
     vector<char> chars = {
@@ -104,6 +105,7 @@ public:
 
     map<string, string> variablesTypesTable;
     map<string, string> variablesTable;
+    map<string,string> functionsTable;
     map<string,string> keyWordsTable;
     map<string,string> operatorsTable;
     map<string,string> constantsTable;

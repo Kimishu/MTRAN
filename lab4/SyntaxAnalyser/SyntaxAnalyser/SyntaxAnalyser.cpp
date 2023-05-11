@@ -175,6 +175,10 @@ shared_ptr<Node> SyntaxAnalyser::ParseVariableOrLiteral() {
                     pos--;
                     return nullptr;
                 }
+                if(Match(vector<string>{";"})){
+                    pos--;
+                    return nullptr;
+                }
                 cout << "Expected literal or variable instead of " << "\'" << tokens[pos]->value << "\'" << endl;
                 std::exit(EXIT_FAILURE);
             }
@@ -261,8 +265,10 @@ shared_ptr<Node> SyntaxAnalyser::ParseCase() {
 shared_ptr<Node> SyntaxAnalyser::ParseReturn() {
 
     shared_ptr<Node> formula = ParseFormula();
-    if(formula->getType() == FunctionCall || formula->getType() == Binary){
-        pos--;
+    if(formula != nullptr) {
+        if (formula->getType() == FunctionCall || formula->getType() == Binary) {
+            pos--;
+        }
     }
     Require(vector<string>{";"});
 

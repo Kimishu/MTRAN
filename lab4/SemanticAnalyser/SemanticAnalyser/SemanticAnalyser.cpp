@@ -113,7 +113,7 @@ void SemanticAnalyser::Analyse(shared_ptr<Node> root) {
     if (root->getType() == Binary) {
         shared_ptr<BinaryOperationNode> binaryOperationNode = dynamic_pointer_cast<BinaryOperationNode>(root);
 
-        if(binaryOperationNode->binaryOperator.value == "=") {
+        //if(binaryOperationNode->binaryOperator.value == "=") {
             if (binaryOperationNode->leftNode->getType() == Variable) {
                 shared_ptr<VariableNode> variableNode = dynamic_pointer_cast<VariableNode>(binaryOperationNode->leftNode);
                 // LITERAL
@@ -164,15 +164,21 @@ void SemanticAnalyser::Analyse(shared_ptr<Node> root) {
                 if(binaryOperationNode->rightNode->getType() == Binary || binaryOperationNode->rightNode->getType() == UnaryOperation){
                     string rightNodeType = AnalyseNode(binaryOperationNode->rightNode);
                     if(variableNode->variable.type != rightNodeType) {
-                        cout << "Cannot solve " << variableNode->variable.type << " and " << rightNodeType << endl;
-                        exit(EXIT_FAILURE);
+                        if(!any_of(numberTypes.begin(),numberTypes.end(),[&variableNode](const string& type){
+                            return variableNode->variable.type == type;
+                        }) || !any_of(numberTypes.begin(), numberTypes.end(),[&rightNodeType](const string& type){
+                            return rightNodeType == type;
+                        })) {
+                            cout << "Cannot solve " << variableNode->variable.type << " and " << rightNodeType << endl;
+                            exit(EXIT_FAILURE);
+                        }
                     }
                 }
             } else {
                 cout << "Expected lvalue but.." << endl;
                 exit(EXIT_FAILURE);
             }
-        }
+        //}
     }
 
     if (root->getType() == UnaryOperation) {
@@ -230,12 +236,24 @@ void SemanticAnalyser::Analyse(shared_ptr<Node> root) {
 
     if (root->getType() == Return) {
         shared_ptr<ReturnNode> returnNode = dynamic_pointer_cast<ReturnNode>(root);
-        Analyse(returnNode->statement);
+
+        string functionReturnType = functions[functions.size()-1]->function.type;
+        string returnType = AnalyseNode(returnNode->statement);
+
+        if(functionReturnType != returnType) {
+            cout << "Wrong function return type!\n" << "Expected: " << functionReturnType << endl << "Detected: " << returnType << endl;
+            exit(EXIT_FAILURE);
+        }
+
     }
 
 }
 
 string SemanticAnalyser::AnalyseNode(shared_ptr<Node> node) {
+
+    if(node == nullptr){
+        return "void";
+    }
 
     if(node->getType() == Binary){
         shared_ptr<BinaryOperationNode> binaryOperationNode = dynamic_pointer_cast<BinaryOperationNode>(node);
@@ -249,7 +267,7 @@ string SemanticAnalyser::AnalyseNode(shared_ptr<Node> node) {
                 if(leftVariableNode->variable.type == rightVariableNode->variable.type){
                     return leftVariableNode->variable.type;
                 } else {
-                    cout << "Cannot solve " << leftVariableNode->variable.type << " and " << rightVariableNode << " variable types" << endl;
+                    cout << "Cannot solve " << leftVariableNode->variable.type << " and " << rightVariableNode->variable.type << " variable types" << endl;
                     exit(EXIT_FAILURE);
                 }
             }
@@ -273,7 +291,6 @@ string SemanticAnalyser::AnalyseNode(shared_ptr<Node> node) {
                     cout << "Cannot solve " << leftVariableNode->variable.type << " and " << rightNodeType << endl;
                     exit(EXIT_FAILURE);
                 }
-
             }
         }
 
@@ -336,7 +353,7 @@ string SemanticAnalyser::AnalyseNode(shared_ptr<Node> node) {
                 }
             }
 
-            if(binaryOperationNode->rightNode->getType() == Binary || binaryOperationNode->rightNode->getType() == Variable || binaryOperationNode->rightNode->getType() == FunctionCall){
+            if(binaryOperationNode->rightNode->getType() == Binary || binaryOperationNode->rightNode->getType() == UnaryOperation || binaryOperationNode->rightNode->getType() == FunctionCall){
                 string rightNodeType = AnalyseNode(binaryOperationNode->rightNode);
 
                 if(leftVariableNode == rightNodeType){
@@ -354,28 +371,99 @@ string SemanticAnalyser::AnalyseNode(shared_ptr<Node> node) {
         shared_ptr<UnaryOperationNode> unaryOperationNode = dynamic_pointer_cast<UnaryOperationNode>(node);
 
         vector<string> booleanOperators = {"!"};
-        vector<string> numberOperators = {"++","--"};
+        vector<string> numberOperators = {"++","--","-","+"};
 
         if(unaryOperationNode->operand->getType() == Variable){
-            auto variable = dynamic_pointer_cast<VariableNode>(unaryOperationNode);
+            auto variable = dynamic_pointer_cast<VariableNode>(unaryOperationNode->operand);
 
             if(any_of(numberOperators.begin(), numberOperators.end(),[&unaryOperationNode](const string& type){
-                return unaryOperationNode->unaryOperator.type == type;
+                return unaryOperationNode->unaryOperator.value == type;
             })){
                 if(!any_of(numberTypes.begin(), numberTypes.end(),[&variable](const string& type){
                     return variable->variable.type == type;
                 })){
-
+                    cout << "Unary operator " << unaryOperationNode->unaryOperator.value << " can be used only with number variables!" << endl;
+                    exit(EXIT_FAILURE);
+                } else {
+                    return variable->variable.type;
                 }
             }
 
             if(any_of(booleanOperators.begin(), booleanOperators.end(),[&unaryOperationNode](const string& type){
                 return unaryOperationNode->unaryOperator.type == type;
             })){
-
+                if(variable->variable.type == "boolean"){
+                    return variable->variable.type;
+                } else {
+                    cout << "Unary operator " << unaryOperationNode->unaryOperator.value << " can be used only with boolean variables!" << endl;
+                    exit(EXIT_FAILURE);
+                }
             }
         }
 
+        if(unaryOperationNode->operand->getType() == Literal){
+            auto literal = dynamic_pointer_cast<LiteralNode>(unaryOperationNode->operand);
+
+            if(any_of(numberOperators.begin(), numberOperators.end(),[&unaryOperationNode](const string& type){
+                return unaryOperationNode->unaryOperator.value == type;
+            })){
+                if(!any_of(numberTypes.begin(), numberTypes.end(),[&literal](const string& type){
+                    return literal->literal.type == type;
+                })){
+                    cout << "Unary operator " << unaryOperationNode->unaryOperator.value << " can be used only with number literals!" << endl;
+                    exit(EXIT_FAILURE);
+                } else {
+                    return literal->literal.type;
+                }
+            }
+
+            if(any_of(booleanOperators.begin(), booleanOperators.end(),[&unaryOperationNode](const string& type){
+                return unaryOperationNode->unaryOperator.value == type;
+            })){
+                if(literal->literal.type == "boolean"){
+                    return literal->literal.type;
+                } else {
+                    cout << "Unary operator " << unaryOperationNode->unaryOperator.value << " can be used only with boolean literals!" << endl;
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+
+        if(unaryOperationNode->operand->getType() == UnaryOperation || unaryOperationNode->operand->getType() == Binary){
+            string operandType = AnalyseNode(unaryOperationNode->operand);
+
+            if(any_of(numberOperators.begin(), numberOperators.end(),[&unaryOperationNode](const string& type){
+                return unaryOperationNode->unaryOperator.value == type;
+            })){
+                if(!any_of(numberTypes.begin(), numberTypes.end(),[&operandType](const string& type){
+                    return operandType == type;
+                })){
+                    cout << "Unary operator " << unaryOperationNode->unaryOperator.value << " can be used only with number expressions!" << endl;
+                    exit(EXIT_FAILURE);
+                } else {
+                    return operandType;
+                }
+            }
+
+            if(any_of(booleanOperators.begin(), booleanOperators.end(),[&unaryOperationNode](const string& type){
+                return unaryOperationNode->unaryOperator.value == type;
+            })){
+                if(operandType == "boolean"){
+                    return operandType;
+                } else {
+                    cout << "Unary operator " << unaryOperationNode->unaryOperator.value << " can be used only with boolean expressions!" << endl;
+                    exit(EXIT_FAILURE);
+                }
+            }
+
+        }
+
+    }
+
+    if(node->getType() == Literal){
+        shared_ptr<LiteralNode> literalNode = dynamic_pointer_cast<LiteralNode>(node);
+
+        return literalNode->literal.type;
     }
 
     if(node->getType() == FunctionCall){
@@ -385,8 +473,6 @@ string SemanticAnalyser::AnalyseNode(shared_ptr<Node> node) {
             return functionCallNode->function.type == function->function.type;
         })->get()->function.type;
     }
-
-
 }
 
 

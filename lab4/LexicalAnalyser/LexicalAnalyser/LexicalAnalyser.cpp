@@ -3,6 +3,7 @@
 //
 
 #include "LexicalAnalyser.h"
+#include "../Scope/Scope.h"
 
 LexicalAnalyser::LexicalAnalyser() {
     defaultPath = R"(..\input.java)";
@@ -48,6 +49,7 @@ void LexicalAnalyser::Analyse() {
         string word;
         bool isVariable = false;
         string variableType;
+
         for(char& ch : line.second){
             bool isChars = any_of(chars.begin(), chars.end(), [&ch](char& c){return ch == c;});
             bool isOperator = any_of(operatorsPattern.begin(), operatorsPattern.end(), [&ch](const pair<string,string>& pr){return string(1,ch) == pr.first;});
@@ -122,12 +124,12 @@ void LexicalAnalyser::Analyse() {
             }
             if (any_of(variablesTable.begin(), variablesTable.end(),
                        [&word](const pair<string, string> &pr) { return word == pr.first; })) {
-
-                tokens.emplace_back(make_shared<Token>(find_if(tokens.begin(), tokens.end(), [&word](shared_ptr<Token> token){
-                    return word == token->value;
-                })->get()->type, word));
-                if(isChars && ch != ' '){
-                    tokens.emplace_back(make_shared<Token>("Special symbol", string(1,ch)));
+                tokens.emplace_back(
+                        make_shared<Token>(find_if(tokens.begin(), tokens.end(), [&word](shared_ptr<Token> token) {
+                            return word == token->value;
+                        })->get()->type, word));
+                if (isChars && ch != ' ') {
+                    tokens.emplace_back(make_shared<Token>("Special symbol", string(1, ch)));
                 }
                 word.clear();
                 continue;
@@ -184,8 +186,9 @@ void LexicalAnalyser::Analyse() {
                 word.clear();
                 continue;
             }
-
-            if(regex_match(word, regex("([0-9]*\.[0-9]+|[0-9]+)")) && isChars){
+            //^-?\d*\.{0,1}\d+$
+            //[0-9]*.[0-9]+|[0-9]+
+            if(regex_match(word, regex("(^-?\\d*\\.{0,1}\\d+$)"))){
                 pair<string,string> pr;
                 if(word == to_string(stoi(word))){
                     pr = make_pair(word,"int");
@@ -220,12 +223,10 @@ void LexicalAnalyser::Analyse() {
                 continue;
             }
 
-
             errorsTable.insert(make_pair("input.java:"+to_string(line.first) + ":" + to_string(line.second.find(ch)-word.length()+1),"Unknown variable!"));
             word.clear();
         }
     }
-
 }
 
 void LexicalAnalyser::Print() {
