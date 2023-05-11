@@ -133,20 +133,19 @@ shared_ptr<Node> SyntaxAnalyser::ParseFunctionCall(shared_ptr<Token> functionNam
 shared_ptr<Node> SyntaxAnalyser::ParseVariableDefinition(shared_ptr<Token> variableName) {
     vector<string> tokenTypes = {"=",";"};
 
-    shared_ptr<VariableNode> variable = make_shared<VariableNode>(variableName.operator*());
+    shared_ptr<VariableTypeNode> variable = make_shared<VariableTypeNode>(variableName.operator*());
 
     shared_ptr<Token> token = Require(tokenTypes);
 
     while (token != nullptr){
         if(token->value == "="){
-            shared_ptr<BinaryOperationNode> binaryOperationNode = make_shared<BinaryOperationNode>(token.operator*(), variable,ParseFormula());
-
+            shared_ptr<BinaryOperationNode> binaryOperationNode = make_shared<BinaryOperationNode>(token.operator*(),variable,ParseFormula());
             Require(vector<string>{";"});
 
             return binaryOperationNode;
         }
         if(token->value == ";"){
-            return make_shared<VariableNode>(variable->variable);
+            return make_shared<VariableTypeNode>(variable->variable);
         }
 
         token = Require(tokenTypes);
@@ -524,11 +523,11 @@ void SyntaxAnalyser::PrintNode(shared_ptr<Node> root, int level) {
         cout << variableNode->variable.value << endl;
     }
 
-//    if(root->getType() == VariableType){
-//        shared_ptr<VariableTypeNode> variableTypeNode = dynamic_pointer_cast<VariableTypeNode>(root);
-//        PrintTab(level);
-//        cout << variableTypeNode.type.value();
-//    }
+    if(root->getType() == VariableType){
+        shared_ptr<VariableTypeNode> variableTypeNode = dynamic_pointer_cast<VariableTypeNode>(root);
+        PrintTab(level);
+        cout << variableTypeNode->variable.value << endl;
+    }
 
     if (root->getType() == Return) {
         shared_ptr<ReturnNode> returnNode = dynamic_pointer_cast<ReturnNode>(root);

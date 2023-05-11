@@ -3,7 +3,6 @@
 //
 
 #include "LexicalAnalyser.h"
-#include "../Scope/Scope.h"
 
 LexicalAnalyser::LexicalAnalyser() {
     defaultPath = R"(..\input.java)";
@@ -87,8 +86,8 @@ void LexicalAnalyser::Analyse() {
                 if(isdigit(word[0])){
                     errorsTable.insert(make_pair("input.java:"+to_string(line.first) + ":" + to_string(line.second.find(ch)-word.length()+1),"Variable mustnt starts with a digit!"));
                 } else {
-                    if (!any_of(variablesTable.begin(), variablesTable.end(),
-                                [&word](const pair<string, string> &pr) { return word == pr.first; })) {
+//                    if (!any_of(variablesTable.begin(), variablesTable.end(),
+//                                [&word](const pair<string, string> &pr) { return word == pr.first; })) {
                         if (!any_of(keyWordsPattern.begin(), keyWordsPattern.end(),
                                     [&word](const pair<string, string> &pr) { return word == pr.first; }) &&
                             !any_of(variablesPattern.begin(), variablesPattern.end(),
@@ -110,11 +109,11 @@ void LexicalAnalyser::Analyse() {
                                                          to_string(line.second.find(ch) - word.length() + 1),
                                                          "Variable name mustn't be a " + type + "! Its forbidden!"));
                         }
-                    } else {
-                        errorsTable.insert(make_pair("input.java:" + to_string(line.first) + ":" +
-                                                     to_string(line.second.find(ch) - word.length() + 1),
-                                                     "Variable with this name already defined!"));
-                    }
+//                    } else {
+//                        errorsTable.insert(make_pair("input.java:" + to_string(line.first) + ":" +
+//                                                     to_string(line.second.find(ch) - word.length() + 1),
+//                                                     "Variable with this name already defined!"));
+//                    }
                 }
                 variableType.clear();
                 word.clear();

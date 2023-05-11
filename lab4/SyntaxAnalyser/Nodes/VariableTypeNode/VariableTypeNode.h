@@ -7,9 +7,12 @@
 
 
 #include "Node.h"
+#include "Token.h"
 
-class VariableTypeNode: Node {
+class VariableTypeNode: public Node {
 public:
+    Token variable;
+    VariableTypeNode(Token variable);
     NodeType getType();
 };
 

@@ -56,6 +56,6 @@ What about semantic analyser?
 This analyser will parse tree and analyse each tree node (construction).
 For each error, of course. 
 
-Current stage: 70%
+Current stage: Done.
 ```
 

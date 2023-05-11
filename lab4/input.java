@@ -1,23 +1,18 @@
 void f(){
-    int s;
+
+    int a = 3;
+
 }
 
 int factorial(int number){
 
-    s = 5;
-    if(number < 0){
-        return 0;
-    }
-    else if(number==0){
-        int b;
-        return 1;
+
+    if(number == 5){
+        int b = 5;
     }
 
-    switch(number){
-        case 99:
-            return 5;
-            break;
-    }
+    b = 7;
+
 
     return number * factorial(number-1);
 }
