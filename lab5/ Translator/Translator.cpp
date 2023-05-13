@@ -211,3 +211,9 @@ void Translator::Run() {
     Execute();
 }
 
+void Translator::Execute() {
+    system("cd .. && javac test.java && java test");
+}
+
+
+

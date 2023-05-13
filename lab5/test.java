@@ -11,8 +11,10 @@ public class test {
 
     public static void main(String[] args){
 
-        int f = factorial(5);
+        int a = 5;
+        int f = factorial(a);
 
         System.out.println(f);
+
     }
 }

@@ -40,6 +40,7 @@ void SemanticAnalyser::Analyse(shared_ptr<Node> root) {
     if (root->getType() == Function) {
         shared_ptr<FunctionNode> functionNode = dynamic_pointer_cast<FunctionNode>(root);
 
+
         functions.push_back(functionNode);
         ScopeAdd(functionNode->function.value);
 
@@ -169,7 +170,7 @@ void SemanticAnalyser::Analyse(shared_ptr<Node> root) {
                     }
                 }
             }
-            if(binaryOperationNode->rightNode->getType() == Binary || binaryOperationNode->rightNode->getType() == UnaryOperation){
+            if(binaryOperationNode->rightNode->getType() == Binary || binaryOperationNode->rightNode->getType() == UnaryOperation || binaryOperationNode->rightNode->getType() == FunctionCall){
                 string rightNodeType = AnalyseNode(binaryOperationNode->rightNode);
                 if(variableNode->variable.type != rightNodeType) {
                     if(!any_of(numberTypes.begin(),numberTypes.end(),[&variableNode](const string& type){
@@ -232,7 +233,7 @@ void SemanticAnalyser::Analyse(shared_ptr<Node> root) {
                     }
                 }
             }
-            if(binaryOperationNode->rightNode->getType() == Binary || binaryOperationNode->rightNode->getType() == UnaryOperation){
+            if(binaryOperationNode->rightNode->getType() == Binary || binaryOperationNode->rightNode->getType() == UnaryOperation || binaryOperationNode->rightNode->getType() == FunctionCall){
                 string rightNodeType = AnalyseNode(binaryOperationNode->rightNode);
                 if(variableNode->variable.type != rightNodeType) {
                     if(!any_of(numberTypes.begin(),numberTypes.end(),[&variableNode](const string& type){
@@ -309,6 +310,7 @@ void SemanticAnalyser::Analyse(shared_ptr<Node> root) {
     if (root->getType() == Return) {
         shared_ptr<ReturnNode> returnNode = dynamic_pointer_cast<ReturnNode>(root);
 
+
         string functionReturnType = functions[functions.size()-1]->function.type;
         string returnType = AnalyseNode(returnNode->statement);
 
@@ -375,7 +377,7 @@ string SemanticAnalyser::AnalyseNode(shared_ptr<Node> node) {
                 if(leftVariableNode->literal.type == rightVariableNode->variable.type){
                     return leftVariableNode->literal.type;
                 } else {
-                    cout << "Cannot solve " << leftVariableNode->literal.type << " and " << rightVariableNode << endl;
+                    cout << "Cannot solve " << leftVariableNode->literal.type << " and " << rightVariableNode->variable.type << endl;
                     exit(EXIT_FAILURE);
                 }
             }
@@ -385,7 +387,7 @@ string SemanticAnalyser::AnalyseNode(shared_ptr<Node> node) {
                 if(leftVariableNode->literal.type == rightVariableNode->literal.type){
                     return leftVariableNode->literal.type;
                 } else {
-                    cout << "Cannot solve " << leftVariableNode->literal.type << " and " << rightVariableNode << endl;
+                    cout << "Cannot solve " << leftVariableNode->literal.type << " and " << rightVariableNode->literal.type << endl;
                     exit(EXIT_FAILURE);
                 }
             }
@@ -540,8 +542,34 @@ string SemanticAnalyser::AnalyseNode(shared_ptr<Node> node) {
         return literalNode->literal.type;
     }
 
+    if(node->getType() == Variable){
+        shared_ptr<VariableNode> variableNode = dynamic_pointer_cast<VariableNode>(node);
+
+        return variableNode->variable.type;
+    }
+
     if(node->getType() == FunctionCall){
         shared_ptr<FunctionCallNode> functionCallNode = dynamic_pointer_cast<FunctionCallNode>(node);
+
+        if(shared_ptr<FunctionNode> function; any_of(functions.begin(), functions.end(),[&functionCallNode, &function](shared_ptr<FunctionNode> f){
+            if(functionCallNode->function.value == f->function.value){
+                function = f;
+                return true;
+            }
+            return false;
+        })){
+            if(function->parameters.size() != functionCallNode->parameters.size()){
+                cout << "Wrong parameters count! Expected: " << function->parameters.size() << " Detected: "<<functionCallNode->parameters.size()<<endl;
+                exit(EXIT_FAILURE);
+            }
+        } else{
+            cout << "Unknown function " << functionCallNode->function.value << " detected";
+            exit(EXIT_FAILURE);
+        }
+
+        for (shared_ptr<Node> &node: functionCallNode->parameters) {
+            Analyse(node);
+        }
 
         return find_if(functions.begin(), functions.end(), [&functionCallNode](shared_ptr<FunctionNode> function){
             return functionCallNode->function.type == function->function.type;
